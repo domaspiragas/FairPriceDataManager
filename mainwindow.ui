@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1091</width>
+    <height>774</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTableWidget" name="mainTable">
+      <property name="editTriggers">
+       <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
+      </property>
+      <property name="dragDropOverwriteMode">
+       <bool>false</bool>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::NoSelection</enum>
+      </property>
+      <row>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>2</string>
+       </property>
+      </row>
+      <column>
+       <property name="text">
+        <string>Date</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Customer Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Phone Number</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Car</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">Work Done</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Hours</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Price</string>
+       </property>
+      </column>
+      <item row="0" column="0">
+       <property name="text">
+        <string>10/10/10</string>
+       </property>
+       <property name="flags">
+        <set>NoItemFlags</set>
+       </property>
+      </item>
+      <item row="0" column="1">
+       <property name="text">
+        <string>Jim</string>
+       </property>
+      </item>
+      <item row="0" column="2">
+       <property name="text">
+        <string>801-888-8888</string>
+       </property>
+      </item>
+      <item row="0" column="3">
+       <property name="text">
+        <string>2007 Ford Focus</string>
+       </property>
+      </item>
+      <item row="0" column="4">
+       <property name="text">
+        <string>Alternator</string>
+       </property>
+      </item>
+      <item row="0" column="5">
+       <property name="text">
+        <string>2.5</string>
+       </property>
+      </item>
+      <item row="0" column="6">
+       <property name="text">
+        <string>125.20</string>
+       </property>
+      </item>
+      <item row="1" column="0">
+       <property name="text">
+        <string>10/11/10</string>
+       </property>
+      </item>
+      <item row="1" column="1">
+       <property name="text">
+        <string>John</string>
+       </property>
+      </item>
+      <item row="1" column="2">
+       <property name="text">
+        <string>801-555-5555</string>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsDragEnabled</set>
+       </property>
+      </item>
+      <item row="1" column="3">
+       <property name="text">
+        <string> 1999 Toyota Carolla</string>
+       </property>
+      </item>
+      <item row="1" column="4">
+       <property name="text">
+        <string>Struts</string>
+       </property>
+      </item>
+      <item row="1" column="5">
+       <property name="text">
+        <string>1.2</string>
+       </property>
+      </item>
+      <item row="1" column="6">
+       <property name="text">
+        <string>65.25</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1091</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSave"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
