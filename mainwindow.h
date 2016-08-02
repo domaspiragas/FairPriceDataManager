@@ -5,6 +5,7 @@
 #include <QTableWidget>
 #include <QPushButton>
 #include <QMap>
+#include <QSet>
 #include "customer.h"
 #include "newcustomer.h"
 #include "existingcustomer.h"
@@ -25,13 +26,16 @@ private:
     Ui::MainWindow *ui;
     //Main storage of Data
     QMap<QString, Customer*> m_customers;
-    void AddNewRow();
+    //Store Customer Names to populate Drop Down
+    QList<QString> m_customerNames;
     QTableWidget* newTable;
     QPushButton* backButton;
 
     NewCustomer* m_newCustomerDialog;
     ExistingCustomer* m_existingCustomerDialog;
 
+    void PopulateCustomerDropDown();
+    void UpdateListing(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
 
 
 private slots:
@@ -40,6 +44,10 @@ private slots:
     void AddCustomer(QString name, QString phoneNumber);
     void AddJob(QString name, QString date, Car* car, QString work, QString hours, QString price);
     void ReceiveNewCustomerInfo(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
+    void ReceiveExistingCustomerInfo(QString name, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
+
+signals:
+    void SendCustomerName(QString name);
 };
 
 #endif // MAINWINDOW_H

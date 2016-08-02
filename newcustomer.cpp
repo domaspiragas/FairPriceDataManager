@@ -16,6 +16,6 @@ NewCustomer::~NewCustomer()
 
 void NewCustomer::on_submitButton_clicked()
 {
-    emit NewCustomerInfo(ui->customerNameBox->text(), ui->customerPhoneNumberBox->text(), ui->carYearBox->text(), ui->carMakeBox->text(),
+    emit NewCustomerInfo(ui->customerNameBox->text().toUpper(), ui->customerPhoneNumberBox->text(), ui->carYearBox->text(), ui->carMakeBox->text(),
                          ui->carModelBox->text(), ui->jobWorkBox->text(), ui->jobHoursBox->text(), ui->jobPriceBox->text(), ui->jobDateBox->text());
 }

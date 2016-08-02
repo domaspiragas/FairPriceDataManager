@@ -17,6 +17,14 @@ public:
 
 private:
     Ui::ExistingCustomer *ui;
+
+private slots:
+    void AddCustomerToList(QString name);
+
+    void on_submitButton_clicked();
+
+signals:
+   void ExistingCustomerInfo(QString name, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
 };
 
 #endif // EXISTINGCUSTOMER_H
