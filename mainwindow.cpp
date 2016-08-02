@@ -12,19 +12,23 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 
     ui->setupUi(this);
+
+     m_newCustomerDialog = new NewCustomer();
     //stretches the last column to the end of the screen
     ui->mainTable->horizontalHeader()->setStretchLastSection(true);
     // signal sent when cell is double clicked
     connect(ui->mainTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(NewTable(int, int)));
+    connect(m_newCustomerDialog, SIGNAL(NewCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString,QString)), this,
+            SLOT(ReceiveNewCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString,QString)));
 
 
-    m_newCustomerDialog = new NewCustomer();
+
     m_newCustomerDialog->show();
 
     m_existingCustomerDialog = new ExistingCustomer();
     m_existingCustomerDialog->show();
     //test stuff
-    AddNewRow();
+    //AddNewRow();
     //NewTable();
 
 }
@@ -81,16 +85,43 @@ void MainWindow::GoBack()
 
 }
 //Adds customer to the map <name, Customer>
-void MainWindow::AddCustomer(std::string name, std::string phoneNumber)
+void MainWindow::AddCustomer(QString name, QString phoneNumber)
 {
     m_customers[name] = new Customer(name, phoneNumber);
 }
 
 //Adds the given job to the Customer with the given name
-void MainWindow::AddJob(std::string name, std::string date, Car car, std::string work, std::string hours, std::string price)
+void MainWindow::AddJob(QString name, QString date, Car* car, QString work, QString hours, QString price)
 {
     /*
      * Emit signal of new car created from given text fields
      */
     m_customers[name]->AddJob(new Job(date, car, work, hours, price));
+}
+void MainWindow::ReceiveNewCustomerInfo(QString  name, QString  phoneNumber, QString  year, QString  make, QString model,
+                     QString work, QString hours, QString price, QString date)
+{
+
+    AddCustomer(name.toUtf8().constData(), phoneNumber.toUtf8().constData());
+    AddJob(name, date, new Car(year.toUtf8().constData(), make.toUtf8().constData(), model.toUtf8().constData()), work, hours, price);
+
+    QLabel* date_ = new QLabel(" " + date);
+    QLabel* name_ = new QLabel(" " + name);
+    QLabel* phone_ = new QLabel(" " + phoneNumber);
+    QLabel* car_ = new QLabel(" " + year + " " + make + " " + model);
+    QLabel* work_ = new QLabel(" " + work);
+    QLabel* hours_ = new QLabel(" " + hours);
+    QLabel* price_ = new QLabel(" " + price);
+    ui->mainTable->insertRow(ui->mainTable->rowCount());
+    ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1,0,date_);
+    ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1,1,name_);
+    ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1,2,phone_);
+    ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1,3,car_);
+    ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1,4,work_);
+    ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1,5,hours_);
+    ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1,6,price_);
+
+    m_newCustomerDialog->hide();
+
+    //ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1, 0, new QLabel(ui->mainTable->item(1,1)->text()));
 }

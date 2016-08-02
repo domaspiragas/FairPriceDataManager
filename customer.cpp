@@ -1,6 +1,6 @@
 #include "customer.h"
 
-Customer::Customer(std::string name, std::string phoneNumber)
+Customer::Customer(QString name, QString phoneNumber)
 {
     m_name = name;
     m_phoneNumber = phoneNumber;
@@ -8,23 +8,23 @@ Customer::Customer(std::string name, std::string phoneNumber)
 // Adds a job to the Customer
 void Customer::AddJob(Job* job)
 {
-    m_jobs.push_back(*job);
+    m_jobs.push_back(job);
 }
 //Getters for Member Variables
-std::string Customer::GetName()
+QString Customer::GetName()
 {
     return m_name;
 }
-std::string Customer::GetPhoneNumber()
+QString Customer::GetPhoneNumber()
 {
     return m_phoneNumber;
 }
 //Setters for Member Variables
-void Customer::SetName(std::string name)
+void Customer::SetName(QString name)
 {
     m_name = name;
 }
-void Customer::SetPhoneNumber(std::string phoneNumber)
+void Customer::SetPhoneNumber(QString phoneNumber)
 {
     m_phoneNumber = phoneNumber;
 }

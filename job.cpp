@@ -1,6 +1,6 @@
 #include "job.h"
 
-Job::Job(std::string date, Car car, std::string work, std::string hours, std::string price)
+Job::Job(QString date, Car* car, QString work, QString hours, QString price)
 {
     m_date = date;
     m_car = car;
@@ -10,44 +10,44 @@ Job::Job(std::string date, Car car, std::string work, std::string hours, std::st
 }
 
 // Getters for Member Variables
-std::string Job::GetDate()
+QString Job::GetDate()
 {
     return m_date;
 }
-Car Job::GetCar()
+Car* Job::GetCar()
 {
     return m_car;
 }
-std::string Job::GetWork()
+QString Job::GetWork()
 {
     return m_work;
 }
-std::string Job::GetHours()
+QString Job::GetHours()
 {
     return m_hours;
 }
-std::string Job::GetPrice()
+QString Job::GetPrice()
 {
     return m_price;
 }
 // Setters for Member Variables
-void Job::SetDate(std::string date)
+void Job::SetDate(QString date)
 {
     m_date = date;
 }
-void Job::SetCar(Car car)
+void Job::SetCar(Car* car)
 {
     m_car = car;
 }
-void Job::SetWork(std::string work)
+void Job::SetWork(QString work)
 {
     m_work = work;
 }
-void Job::SetHours(std::string hours)
+void Job::SetHours(QString hours)
 {
     m_hours = hours;
 }
-void Job::SetPrice(std::string price)
+void Job::SetPrice(QString price)
 {
     m_price = price;
 }

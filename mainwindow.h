@@ -24,7 +24,7 @@ public:
 private:
     Ui::MainWindow *ui;
     //Main storage of Data
-    QMap<std::string, Customer*> m_customers;
+    QMap<QString, Customer*> m_customers;
     void AddNewRow();
     QTableWidget* newTable;
     QPushButton* backButton;
@@ -37,8 +37,9 @@ private:
 private slots:
     void GoBack();
     void NewTable(int, int);
-    void AddCustomer(std::string name, std::string phoneNumber);
-    void AddJob(std::string name, std::string date, Car car, std::string work, std::string hours, std::string price);
+    void AddCustomer(QString name, QString phoneNumber);
+    void AddJob(QString name, QString date, Car* car, QString work, QString hours, QString price);
+    void ReceiveNewCustomerInfo(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
 };
 
 #endif // MAINWINDOW_H

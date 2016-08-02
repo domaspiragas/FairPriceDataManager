@@ -1,22 +1,22 @@
 #ifndef CAR_H
 #define CAR_H
-#include <string>
+#include <QString>
 
 class Car
 {
 public:
     Car();
-    Car(std::string year, std::string make, std::string model);
-    std::string GetYear();
-    std::string GetMake();
-    std::string GetModel();
-    void SetYear(std::string year);
-    void SetMake(std::string make);
-    void SetModel(std::string model);
+    Car(QString year, QString make, QString model);
+    QString GetYear();
+    QString GetMake();
+    QString GetModel();
+    void SetYear(QString year);
+    void SetMake(QString make);
+    void SetModel(QString model);
 private:
-    std::string m_year;
-    std::string m_make;
-    std::string m_model;
+    QString m_year;
+    QString m_make;
+    QString m_model;
 };
 
 #endif // CAR_H

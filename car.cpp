@@ -1,7 +1,7 @@
 #include "car.h"
 
 Car::Car(){}
-Car::Car(std::string year, std::string make, std::string model)
+Car::Car(QString year, QString make, QString model)
 {
     m_year = year;
     m_make = make;
@@ -9,28 +9,28 @@ Car::Car(std::string year, std::string make, std::string model)
 }
 
 // Getters for Member Variables
-std::string Car::GetYear()
+QString Car::GetYear()
 {
     return m_year;
 }
-std::string Car::GetMake()
+QString Car::GetMake()
 {
     return m_make;
 }
-std::string Car::GetModel()
+QString Car::GetModel()
 {
     return m_model;
 }
 // Setters for Member Variables
-void Car::SetYear(std::string year)
+void Car::SetYear(QString year)
 {
     m_year = year;
 }
-void Car::SetMake(std::string make)
+void Car::SetMake(QString make)
 {
     m_make = make;
 }
-void Car::SetModel(std::string model)
+void Car::SetModel(QString model)
 {
     m_model = model;
 }
