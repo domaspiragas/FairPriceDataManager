@@ -16,13 +16,17 @@ public:
     ~NewCustomer();
 
 private slots:
+    void ReceiveCloseRequest();
     void on_submitButton_clicked();
+    void on_cancelButton_clicked();
 
 private:
     Ui::NewCustomer *ui;
+    void ClearClose();
 
 signals:
     void NewCustomerInfo(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
+
 };
 
 #endif // NEWCUSTOMER_H

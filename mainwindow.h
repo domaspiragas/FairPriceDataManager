@@ -45,9 +45,13 @@ private slots:
     void AddJob(QString name, QString date, Car* car, QString work, QString hours, QString price);
     void ReceiveNewCustomerInfo(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
     void ReceiveExistingCustomerInfo(QString name, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
+    void OpenNewCustomerDialog();
+    void OpenExistingCustomerDialog();
 
 signals:
     void SendCustomerName(QString name);
+    void CloseNewCustWindow();
+    void CloseExistingCustWindow();
 };
 
 #endif // MAINWINDOW_H

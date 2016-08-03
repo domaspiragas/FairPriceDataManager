@@ -20,15 +20,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainTable->horizontalHeader()->setStretchLastSection(true);
     // signal sent when cell is double clicked
     connect(ui->mainTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(NewTable(int, int)));
+    connect(this, SIGNAL(SendCustomerName(QString)), m_existingCustomerDialog, SLOT(AddCustomerToList(QString)));
     connect(m_newCustomerDialog, SIGNAL(NewCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(ReceiveNewCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString,QString)));
     connect(m_existingCustomerDialog, SIGNAL(ExistingCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(ReceiveExistingCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString)));
-    connect(this, SIGNAL(SendCustomerName(QString)), m_existingCustomerDialog, SLOT(AddCustomerToList(QString)));
+    connect(this, SIGNAL(CloseExistingCustWindow()), m_existingCustomerDialog, SLOT(ReceiveCloseRequest()));
+        connect(this, SIGNAL(CloseNewCustWindow()), m_newCustomerDialog, SLOT(ReceiveCloseRequest()));
+    connect(ui->actionNew_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenNewCustomerDialog()));
+    connect(ui->actionExisting_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenExistingCustomerDialog()));
 
 
-    m_newCustomerDialog->show();
-    m_existingCustomerDialog->show();
+    //m_newCustomerDialog->show();
+    //m_existingCustomerDialog->show();
     //test stuff
     //AddNewRow();
     //NewTable();
@@ -95,11 +99,13 @@ void MainWindow::ReceiveNewCustomerInfo(QString  name, QString  phoneNumber, QSt
     }
     AddJob(name, date, new Car(year, make, model), work, hours, price);
     UpdateListing(name, phoneNumber, year, make, model, work, hours, price, date);
+    emit CloseNewCustWindow();
 }
 void MainWindow::ReceiveExistingCustomerInfo(QString name, QString year, QString make, QString model, QString work, QString hours, QString price, QString date)
 {
     AddJob(name, date, new Car(year, make, model), work, hours, price);
     UpdateListing(name, m_customers[name]->GetPhoneNumber(), year, make, model, work, hours, price, date);
+    emit CloseExistingCustWindow();
 }
 void MainWindow::PopulateCustomerDropDown()
 {
@@ -132,4 +138,12 @@ void MainWindow::UpdateListing(QString name, QString phoneNumber, QString year, 
    // m_newCustomerDialog->hide();
 
     //ui->mainTable->setCellWidget(ui->mainTable->rowCount()-1, 0, new QLabel(ui->mainTable->item(1,1)->text()));
+}
+void MainWindow::OpenNewCustomerDialog()
+{
+    m_newCustomerDialog->show();
+}
+void MainWindow::OpenExistingCustomerDialog()
+{
+    m_existingCustomerDialog->show();
 }

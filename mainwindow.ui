@@ -167,6 +167,14 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuAdd">
+     <property name="title">
+      <string>Add</string>
+     </property>
+     <addaction name="actionNew_Customer"/>
+     <addaction name="actionExisting_Customer"/>
+    </widget>
+    <addaction name="menuAdd"/>
     <addaction name="actionSave"/>
    </widget>
    <addaction name="menuFile"/>
@@ -175,6 +183,16 @@
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
+   </property>
+  </action>
+  <action name="actionExisting_Customer">
+   <property name="text">
+    <string>Existing Customer</string>
+   </property>
+  </action>
+  <action name="actionNew_Customer">
+   <property name="text">
+    <string>New Customer</string>
    </property>
   </action>
  </widget>

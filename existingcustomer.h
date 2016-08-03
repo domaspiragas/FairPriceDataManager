@@ -17,11 +17,13 @@ public:
 
 private:
     Ui::ExistingCustomer *ui;
+    void ClearClose();
 
 private slots:
     void AddCustomerToList(QString name);
-
+    void ReceiveCloseRequest();
     void on_submitButton_clicked();
+    void on_cancelButton_clicked();
 
 signals:
    void ExistingCustomerInfo(QString name, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
