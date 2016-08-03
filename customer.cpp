@@ -29,3 +29,7 @@ void Customer::SetPhoneNumber(QString phoneNumber)
     m_phoneNumber = phoneNumber;
 }
 
+QList<Job*> Customer::GetJobs()
+{
+    return m_jobs;
+}

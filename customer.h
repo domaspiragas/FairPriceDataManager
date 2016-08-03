@@ -13,6 +13,7 @@ public:
     void SetName(QString);
     void SetPhoneNumber(QString);
     void AddJob(Job* job);
+    QList<Job*> GetJobs();
 private:
     QString m_name;
     QString m_phoneNumber;
