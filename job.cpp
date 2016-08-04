@@ -8,7 +8,7 @@ Job::Job(QString date, Car* car, QString work, QString hours, QString price)
     m_hours = hours;
     m_price = price;
 }
-
+Job::~Job(){}
 // Getters for Member Variables
 QString Job::GetDate()
 {

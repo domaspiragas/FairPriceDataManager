@@ -7,6 +7,7 @@ class Job
 {
 public:
     Job(QString date, Car* car, QString work, QString hours, QString price);
+    ~Job();
     QString GetDate();
     Car* GetCar();
     QString GetWork();

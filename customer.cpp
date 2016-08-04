@@ -5,10 +5,15 @@ Customer::Customer(QString name, QString phoneNumber)
     m_name = name;
     m_phoneNumber = phoneNumber;
 }
+Customer::~Customer(){}
 // Adds a job to the Customer
 void Customer::AddJob(Job* job)
 {
-    m_jobs.push_back(job);
+    m_jobs[job->GetDate()] = job;
+}
+void Customer::RemoveJob(QString date)
+{
+    m_jobs.remove(date);
 }
 //Getters for Member Variables
 QString Customer::GetName()
@@ -29,7 +34,7 @@ void Customer::SetPhoneNumber(QString phoneNumber)
     m_phoneNumber = phoneNumber;
 }
 
-QList<Job*> Customer::GetJobs()
+QMap<QString, Job *> Customer::GetJobs()
 {
     return m_jobs;
 }

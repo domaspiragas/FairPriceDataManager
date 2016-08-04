@@ -37,18 +37,20 @@ private:
     void ShowJobsTableHideMainTable();
     void PopulateCustomerDropDown();
     void UpdateListing(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
+    void OpenJobsView(int row, int col);
 
 
 private slots:
     void GoBack();
-    void OpenJobsList(int, int);
+    void HandleDoubleClickedCell(int, int);
     void AddCustomer(QString name, QString phoneNumber);
     void AddJob(QString name, QString date, Car* car, QString work, QString hours, QString price);
     void ReceiveNewCustomerInfo(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
     void ReceiveExistingCustomerInfo(QString name, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
     void OpenNewCustomerDialog();
     void OpenExistingCustomerDialog();
-
+    void on_addButton_clicked();
+    void on_deleteButton_clicked();
 
 signals:
     void SendCustomerName(QString name);

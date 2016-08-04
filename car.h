@@ -6,6 +6,7 @@ class Car
 {
 public:
     Car();
+    ~Car();
     Car(QString year, QString make, QString model);
     QString GetYear();
     QString GetMake();

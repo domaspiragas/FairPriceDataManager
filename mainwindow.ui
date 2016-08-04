@@ -16,6 +16,80 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="addButton">
+        <property name="maximumSize">
+         <size>
+          <width>25</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>+</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="deleteButton">
+        <property name="maximumSize">
+         <size>
+          <width>25</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="searchLabel">
+        <property name="text">
+         <string>Search</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>250</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QTableWidget" name="mainTable">
       <property name="editTriggers">
        <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
@@ -74,6 +148,11 @@
         <string>Price</string>
        </property>
       </column>
+      <column>
+       <property name="text">
+        <string/>
+       </property>
+      </column>
       <item row="0" column="0">
        <property name="text">
         <string>10/10/10</string>
@@ -92,11 +171,6 @@
         <string>801-888-8888</string>
        </property>
       </item>
-      <item row="0" column="3">
-       <property name="text">
-        <string>2007 Ford Focus</string>
-       </property>
-      </item>
       <item row="0" column="4">
        <property name="text">
         <string>Alternator</string>
@@ -110,6 +184,11 @@
       <item row="0" column="6">
        <property name="text">
         <string>125.20</string>
+       </property>
+      </item>
+      <item row="0" column="7">
+       <property name="text">
+        <string>X</string>
        </property>
       </item>
       <item row="1" column="0">
@@ -130,11 +209,6 @@
         <set>ItemIsSelectable|ItemIsDragEnabled</set>
        </property>
       </item>
-      <item row="1" column="3">
-       <property name="text">
-        <string> 1999 Toyota Carolla</string>
-       </property>
-      </item>
       <item row="1" column="4">
        <property name="text">
         <string>Struts</string>
@@ -148,6 +222,11 @@
       <item row="1" column="6">
        <property name="text">
         <string>65.25</string>
+       </property>
+      </item>
+      <item row="1" column="7">
+       <property name="text">
+        <string>X</string>
        </property>
       </item>
      </widget>

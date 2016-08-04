@@ -1,6 +1,7 @@
 #include "car.h"
 
 Car::Car(){}
+Car::~Car(){}
 Car::Car(QString year, QString make, QString model)
 {
     m_year = year;
