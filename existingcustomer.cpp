@@ -1,5 +1,6 @@
 #include "existingcustomer.h"
 #include "ui_existingcustomer.h"
+#include <QDebug>
 
 ExistingCustomer::ExistingCustomer(QWidget *parent) :
     QDialog(parent),
@@ -18,7 +19,6 @@ void ExistingCustomer::AddCustomerToList(QString name)
 {
     ui->customerComboBox->addItem(name);
 }
-
 void ExistingCustomer::ReceiveCloseRequest()
 {
     ClearClose();

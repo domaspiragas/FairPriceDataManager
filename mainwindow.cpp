@@ -65,9 +65,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Load();
 
-    qDebug() << m_dateCustomerPairs.at(0).first;
-
-
 }
 
 MainWindow::~MainWindow()
@@ -80,13 +77,26 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
     //to avoid an additional "connect" statement and slot we check if the main table is showing, if not the jobs table is showing.
     if(ui->mainTable->isVisible())
     {
+        // Click on Customer Name
         if(col == 1 )
         {
             OpenJobsView(row, col);
         }
+        // Click on Remove
         else if(col == 7)
         {
             m_customers[ui->mainTable->item(row, 1)->text()]->RemoveJob(ui->mainTable->item(row, 0)->text());
+           //remove from m_dateCustomerPairs O of N, but best solution for now
+            for(int i = 0; i< m_dateCustomerPairs.size(); i++)
+            {
+                // if the date and name are the same as the row clicked, remove that QPair from list
+                if(m_dateCustomerPairs[i].first == ui->mainTable->item(row, 0)->text() && m_dateCustomerPairs[i].second->GetName() == ui->mainTable->item(row, 1)->text())
+                {
+                    m_dateCustomerPairs.removeAt(i);
+                    // end once found and removed
+                    break;
+                }
+            }
             ui->mainTable->removeRow(row);
         }
     }
@@ -141,15 +151,6 @@ void MainWindow::ReceiveExistingCustomerInfo(QString name, QString year, QString
     AddJob(name, date, new Car(year, make, model), work, hours, price);
     UpdateListing(name, m_customers[name]->GetPhoneNumber(), year, make, model, work, hours, price, date);
     emit CloseExistingCustWindow();
-}
-void MainWindow::PopulateCustomerDropDown()
-{
-    //Sort the list to be in alphabetical order
-    qSort(m_customerNames);
-    foreach(QString name, m_customerNames)
-    {
-        emit SendCustomerName(name.toUpper());
-    }
 }
 void MainWindow::UpdateListing(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date)
 {
@@ -270,6 +271,7 @@ void MainWindow::Load()
     ui->mainTable->setRowCount(0);
     foreach(Customer* customer, m_customers)
     {
+        emit SendCustomerName(customer->GetName());
         foreach(Job* job, customer->GetJobs())
         {
             UpdateListing(customer->GetName(), customer->GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(),
@@ -288,7 +290,8 @@ void MainWindow::SortByDate(int section)
         });
         // clear the table
         ui->mainTable->setRowCount(0);
-        // Go through each pair of date/customer
+
+        //Used to swap from ascending to decending dates
         m_ascendingDateFlag = !m_ascendingDateFlag;
         if(m_ascendingDateFlag)
         {
