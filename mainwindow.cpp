@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_existingCustomerDialog = new ExistingCustomer();
     //ui->mainTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->mainTable->setColumnWidth(3, 200);
+    ui->mainTable->setColumnWidth(4, 250);
     //stretches the last column to the end of the screen
     ui->mainTable->horizontalHeader()->setStretchLastSection(true);
     ui->jobsTable->horizontalHeader()->setStretchLastSection(true);
@@ -24,7 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     HideJobsTableShowMainTable();
 
     // signal sent when cell is double clicked
-    connect(ui->mainTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(HandleDoubleClickedCell(int, int)));
+    connect(ui->mainTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(HandleDoubleClickedCell(int,int)));
+    connect(ui->jobsTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(HandleDoubleClickedCell(int,int)));
     // used to populate drop down
     connect(this, SIGNAL(SendCustomerName(QString)), m_existingCustomerDialog, SLOT(AddCustomerToList(QString)));
     // receive information from dialogs
@@ -39,9 +41,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->backButton, SIGNAL(clicked(bool)), this, SLOT(GoBack()));
 
 
-//    m_customers["SOMETHING"] = new Customer("SOMETHING", "911");
-//    m_customers["SOMETHING"]->AddJob(new Job("10/20/30", new Car("1920","ford","focus"),"struts", "2", "100"));
-//    m_customers["SOMETHING"]->AddJob(new Job("11/20/10", new Car("1980","toyota","focus"),"brakes", "2", "150"));
+    //    m_customers["SOMETHING"] = new Customer("SOMETHING", "911");
+    //    m_customers["SOMETHING"]->AddJob(new Job("10/20/30", new Car("1920","ford","focus"),"struts", "2", "100"));
+    //    m_customers["SOMETHING"]->AddJob(new Job("11/20/10", new Car("1980","toyota","focus"),"brakes", "2", "150"));
 
 }
 
@@ -52,23 +54,36 @@ MainWindow::~MainWindow()
 
 void MainWindow::HandleDoubleClickedCell(int row, int col)
 {
-    if(col == 1 )
+    //to avoid an additional "connect" statement and slot we check if the main table is showing, if not the jobs table is showing.
+    if(ui->mainTable->isVisible())
     {
-        OpenJobsView(row, col);
+        if(col == 1 )
+        {
+            OpenJobsView(row, col);
+        }
+        else if(col == 7)
+        {
+            m_customers[ui->mainTable->item(row, 1)->text()]->RemoveJob(ui->mainTable->item(row, 0)->text());
+            ui->mainTable->removeRow(row);
+        }
     }
-    else if(col == 7)
+    // the jobs table is showing
+    else if (ui->jobsTable->isVisible())
     {
-      m_customers[ui->mainTable->item(row, 1)->text()]->RemoveJob(ui->mainTable->item(row, 0)->text());
-      ui->mainTable->removeRow(row);
+        // col 5 is the "remove buttons"
+        if(col == 5)
+        {
+            m_customers[ui->nameLabel->text()]->RemoveJob(ui->jobsTable->item(row, 0)->text());
+            ui->jobsTable->removeRow(row);
+        }
     }
-
-
 }
 void MainWindow::GoBack()
 {
     //clear jobs table
     ui->jobsTable->setRowCount(0);
     HideJobsTableShowMainTable();
+    Load();
 }
 //Adds customer to the map <name, Customer>
 void MainWindow::AddCustomer(QString name, QString phoneNumber)
@@ -87,7 +102,7 @@ void MainWindow::AddJob(QString name, QString date, Car* car, QString work, QStr
     m_customers[name]->AddJob(new Job(date, car, work, hours, price));
 }
 void MainWindow::ReceiveNewCustomerInfo(QString  name, QString  phoneNumber, QString  year, QString  make, QString model,
-                     QString work, QString hours, QString price, QString date)
+                                        QString work, QString hours, QString price, QString date)
 {
     // If the doesn't exist create it
     if(!m_customerNames.contains(name))
@@ -199,6 +214,8 @@ void MainWindow::OpenJobsView(int row, int col)
         hours_->setFlags(hours_->flags() ^ Qt::ItemIsEditable);
         QTableWidgetItem* price_ = new QTableWidgetItem(job->GetPrice());
         price_->setFlags(price_->flags() ^ Qt::ItemIsEditable);
+        QTableWidgetItem* remove_ = new QTableWidgetItem("X");
+        remove_->setFlags(remove_->flags() ^ Qt::ItemIsEditable);
 
         ui->jobsTable->insertRow(ui->jobsTable->rowCount());
 
@@ -207,9 +224,23 @@ void MainWindow::OpenJobsView(int row, int col)
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,2,work_);
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,3,hours_);
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,4,price_);
+        ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,5,remove_);
 
     }
     //change labels
     ui->nameLabel->setText(name);
     ui->phoneNumberLabel->setText(m_customers[name]->GetPhoneNumber());
+}
+
+void MainWindow::Load()
+{
+    ui->mainTable->setRowCount(0);
+    foreach(Customer* customer, m_customers)
+    {
+        foreach(Job* job, customer->GetJobs())
+        {
+            UpdateListing(customer->GetName(), customer->GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                          job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+        }
+    }
 }

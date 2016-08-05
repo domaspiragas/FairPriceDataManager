@@ -38,6 +38,7 @@ private:
     void PopulateCustomerDropDown();
     void UpdateListing(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
     void OpenJobsView(int row, int col);
+    void Load();
 
 
 private slots:
