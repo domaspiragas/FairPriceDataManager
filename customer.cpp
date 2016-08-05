@@ -38,3 +38,8 @@ QMap<QString, Job *> Customer::GetJobs()
 {
     return m_jobs;
 }
+// Returns the job with the given date
+Job* Customer::GetSpecificJob(QString date)
+{
+    return m_jobs[date];
+}

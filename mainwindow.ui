@@ -47,27 +47,17 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <widget class="QLabel" name="searchLabel">
         <property name="text">
          <string>Search</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="searchBox">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -103,16 +93,9 @@
       <property name="selectionMode">
        <enum>QAbstractItemView::NoSelection</enum>
       </property>
-      <row>
-       <property name="text">
-        <string>1</string>
-       </property>
-      </row>
-      <row>
-       <property name="text">
-        <string>2</string>
-       </property>
-      </row>
+      <attribute name="horizontalHeaderHighlightSections">
+       <bool>false</bool>
+      </attribute>
       <column>
        <property name="text">
         <string>Date</string>
@@ -153,82 +136,6 @@
         <string/>
        </property>
       </column>
-      <item row="0" column="0">
-       <property name="text">
-        <string>10/10/10</string>
-       </property>
-       <property name="flags">
-        <set>NoItemFlags</set>
-       </property>
-      </item>
-      <item row="0" column="1">
-       <property name="text">
-        <string>Jim</string>
-       </property>
-      </item>
-      <item row="0" column="2">
-       <property name="text">
-        <string>801-888-8888</string>
-       </property>
-      </item>
-      <item row="0" column="4">
-       <property name="text">
-        <string>Alternator</string>
-       </property>
-      </item>
-      <item row="0" column="5">
-       <property name="text">
-        <string>2.5</string>
-       </property>
-      </item>
-      <item row="0" column="6">
-       <property name="text">
-        <string>125.20</string>
-       </property>
-      </item>
-      <item row="0" column="7">
-       <property name="text">
-        <string>X</string>
-       </property>
-      </item>
-      <item row="1" column="0">
-       <property name="text">
-        <string>10/11/10</string>
-       </property>
-      </item>
-      <item row="1" column="1">
-       <property name="text">
-        <string>John</string>
-       </property>
-      </item>
-      <item row="1" column="2">
-       <property name="text">
-        <string>801-555-5555</string>
-       </property>
-       <property name="flags">
-        <set>ItemIsSelectable|ItemIsDragEnabled</set>
-       </property>
-      </item>
-      <item row="1" column="4">
-       <property name="text">
-        <string>Struts</string>
-       </property>
-      </item>
-      <item row="1" column="5">
-       <property name="text">
-        <string>1.2</string>
-       </property>
-      </item>
-      <item row="1" column="6">
-       <property name="text">
-        <string>65.25</string>
-       </property>
-      </item>
-      <item row="1" column="7">
-       <property name="text">
-        <string>X</string>
-       </property>
-      </item>
      </widget>
     </item>
     <item>
@@ -269,12 +176,29 @@
       </item>
       <item>
        <widget class="QTableWidget" name="jobsTable">
+        <property name="editTriggers">
+         <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
+        </property>
+        <property name="dragDropOverwriteMode">
+         <bool>false</bool>
+        </property>
         <property name="alternatingRowColors">
          <bool>true</bool>
         </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::NoSelection</enum>
+        </property>
+        <attribute name="horizontalHeaderHighlightSections">
+         <bool>false</bool>
+        </attribute>
         <column>
          <property name="text">
           <string>Date</string>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
          </property>
         </column>
         <column>
@@ -310,14 +234,14 @@
          <number>0</number>
         </property>
         <item>
-         <spacer name="horizontalSpacer">
+         <spacer name="bottomHorizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
-            <height>20</height>
+            <width>1</width>
+            <height>1</height>
            </size>
           </property>
          </spacer>
@@ -360,7 +284,6 @@
    </widget>
    <addaction name="menuFile"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionSave">
    <property name="text">
     <string>Save</string>

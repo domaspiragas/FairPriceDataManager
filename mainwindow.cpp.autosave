@@ -288,7 +288,8 @@ void MainWindow::SortByDate(int section)
         });
         // clear the table
         ui->mainTable->setRowCount(0);
-        // Go through each pair of date/customer
+        
+        //Used to swap from ascending to decending dates
         m_ascendingDateFlag = !m_ascendingDateFlag;
         if(m_ascendingDateFlag)
         {

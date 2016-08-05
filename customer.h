@@ -16,6 +16,7 @@ public:
     void AddJob(Job* job);
     void RemoveJob(QString);
     QMap<QString, Job*> GetJobs();
+    Job* GetSpecificJob(QString date);
 private:
     QString m_name;
     QString m_phoneNumber;

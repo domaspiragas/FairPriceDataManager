@@ -28,11 +28,10 @@ private:
     QMap<QString, Customer*> m_customers;
     //Store Customer Names to populate Drop Down
     QList<QString> m_customerNames;
-    QTableWidget* newTable;
-    QPushButton* backButton;
-
+    QList<QPair<QString, Customer*>> m_dateCustomerPairs;
     NewCustomer* m_newCustomerDialog;
     ExistingCustomer* m_existingCustomerDialog;
+    bool m_ascendingDateFlag;
     void HideJobsTableShowMainTable();
     void ShowJobsTableHideMainTable();
     void PopulateCustomerDropDown();
@@ -52,6 +51,7 @@ private slots:
     void OpenExistingCustomerDialog();
     void on_addButton_clicked();
     void on_deleteButton_clicked();
+    void SortByDate(int);
 
 signals:
     void SendCustomerName(QString name);
