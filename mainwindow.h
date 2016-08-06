@@ -29,9 +29,11 @@ private:
     //Store Customer Names to populate Drop Down
     QList<QString> m_customerNames;
     QList<QPair<QString, Customer*>> m_dateCustomerPairs;
+    QList<QPair<QString, Customer*>> m_searchDateCustomerPairs;
     NewCustomer* m_newCustomerDialog;
     ExistingCustomer* m_existingCustomerDialog;
     bool m_ascendingDateFlag;
+    bool m_searchBeingUsed;
     void HideJobsTableShowMainTable();
     void ShowJobsTableHideMainTable();
     void UpdateListing(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
@@ -51,6 +53,7 @@ private slots:
     void on_addButton_clicked();
     void on_deleteButton_clicked();
     void SortByDate(int);
+    void SearchSort(QString);
 
 signals:
     void SendCustomerName(QString name);

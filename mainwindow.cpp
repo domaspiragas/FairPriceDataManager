@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
     ui->setupUi(this);
 
     m_newCustomerDialog = new NewCustomer();
@@ -44,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionExisting_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenExistingCustomerDialog()));
     connect(ui->backButton, SIGNAL(clicked(bool)), this, SLOT(GoBack()));
     connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByDate(int)));
+
+    connect(ui->searchBox, SIGNAL(textEdited(QString)), this, SLOT(SearchSort(QString)));
 
 
     /*FOR TESTING*/
@@ -86,7 +87,7 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
         else if(col == 7)
         {
             m_customers[ui->mainTable->item(row, 1)->text()]->RemoveJob(ui->mainTable->item(row, 0)->text());
-           //remove from m_dateCustomerPairs O of N, but best solution for now
+            //remove from m_dateCustomerPairs O of N, but best solution for now
             for(int i = 0; i< m_dateCustomerPairs.size(); i++)
             {
                 // if the date and name are the same as the row clicked, remove that QPair from list
@@ -132,6 +133,7 @@ void MainWindow::AddJob(QString name, QString date, Car* car, QString work, QStr
     m_customers[name]->AddJob(new Job(date, car, work, hours, price));
 
     m_dateCustomerPairs.push_back(qMakePair(date, m_customers[name]));
+
 
 }
 void MainWindow::ReceiveNewCustomerInfo(QString  name, QString  phoneNumber, QString  year, QString  make, QString model,
@@ -269,14 +271,35 @@ void MainWindow::OpenJobsView(int row, int col)
 void MainWindow::Load()
 {
     ui->mainTable->setRowCount(0);
-    foreach(Customer* customer, m_customers)
+    // if search is empty populate all jobs
+    if(!m_searchBeingUsed)
     {
-        emit SendCustomerName(customer->GetName());
-        foreach(Job* job, customer->GetJobs())
+        foreach(Customer* customer, m_customers)
         {
-            UpdateListing(customer->GetName(), customer->GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(),
-                          job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+            emit SendCustomerName(customer->GetName());
+            foreach(Job* job, customer->GetJobs())
+            {
+                UpdateListing(customer->GetName(), customer->GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                              job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+            }
         }
+    }
+    //if search contains something populate only searched for jobs
+    else
+    {
+        foreach(Customer* customer, m_customers)
+        {
+            if(customer->GetName().startsWith(ui->searchBox->text().toUpper()))
+            {
+                foreach(Job* job, customer->GetJobs())
+                {
+                    m_searchDateCustomerPairs.push_back(qMakePair(job->GetDate(), customer));
+                    UpdateListing(customer->GetName(), customer->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                                  job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+                }
+            }
+        }
+
     }
 }
 void MainWindow::SortByDate(int section)
@@ -284,30 +307,96 @@ void MainWindow::SortByDate(int section)
     //if date was clicked
     if(section == 0)
     {
-        //sort date/customer pairs by date
-        std::sort(m_dateCustomerPairs.begin(), m_dateCustomerPairs.end(), [] (QPair<QString, Customer*>& lhs, QPair<QString, Customer*>& rhs) {
-            return lhs.first < rhs.first;
-        });
-        // clear the table
-        ui->mainTable->setRowCount(0);
-
-        //Used to swap from ascending to decending dates
-        m_ascendingDateFlag = !m_ascendingDateFlag;
-        if(m_ascendingDateFlag)
+        if(!m_searchBeingUsed)
         {
-            for(int i = 0; i < m_dateCustomerPairs.size(); i++)
+            //sort date/customer pairs by date
+            std::sort(m_dateCustomerPairs.begin(), m_dateCustomerPairs.end(), [] (QPair<QString, Customer*>& lhs, QPair<QString, Customer*>& rhs) {
+                return lhs.first < rhs.first;
+            });
+            // clear the table
+            ui->mainTable->setRowCount(0);
+
+            //Used to swap from ascending to decending dates
+            m_ascendingDateFlag = !m_ascendingDateFlag;
+
+            if(m_ascendingDateFlag)
             {
-                Job* job = m_dateCustomerPairs.at(i).second->GetSpecificJob(m_dateCustomerPairs.at(i).first);
-                UpdateListing(m_dateCustomerPairs.at(i).second->GetName(), m_dateCustomerPairs.at(i).second->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
-                              job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+                for(int i = 0; i < m_dateCustomerPairs.size(); i++)
+                {
+                    Job* job = m_dateCustomerPairs.at(i).second->GetSpecificJob(m_dateCustomerPairs.at(i).first);
+                    UpdateListing(m_dateCustomerPairs.at(i).second->GetName(), m_dateCustomerPairs.at(i).second->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                                  job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+                }
+            }
+            else
+            {
+                for(int i = m_dateCustomerPairs.size()-1; i >= 0; i--)
+                {
+                    Job* job = m_dateCustomerPairs.at(i).second->GetSpecificJob(m_dateCustomerPairs.at(i).first);
+                    UpdateListing(m_dateCustomerPairs.at(i).second->GetName(), m_dateCustomerPairs.at(i).second->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                                  job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+                }
             }
         }
         else
         {
-            for(int i = m_dateCustomerPairs.size()-1; i >= 0; i--)
+            std::sort(m_searchDateCustomerPairs.begin(), m_searchDateCustomerPairs.end(), [] (QPair<QString, Customer*>& lhs, QPair<QString, Customer*>& rhs) {
+                return lhs.first < rhs.first;
+            });
+
+            // clear the table
+            ui->mainTable->setRowCount(0);
+
+            //Used to swap from ascending to decending dates
+            m_ascendingDateFlag = !m_ascendingDateFlag;
+
+            if(m_ascendingDateFlag)
             {
-                Job* job = m_dateCustomerPairs.at(i).second->GetSpecificJob(m_dateCustomerPairs.at(i).first);
-                UpdateListing(m_dateCustomerPairs.at(i).second->GetName(), m_dateCustomerPairs.at(i).second->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                for(int i = 0; i < m_searchDateCustomerPairs.size(); i++)
+                {
+                    Job* job = m_searchDateCustomerPairs.at(i).second->GetSpecificJob(m_searchDateCustomerPairs.at(i).first);
+                    UpdateListing(m_searchDateCustomerPairs.at(i).second->GetName(), m_searchDateCustomerPairs.at(i).second->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                                  job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+                }
+            }
+            else
+            {
+                for(int i = m_searchDateCustomerPairs.size()-1; i >= 0; i--)
+                {
+                    Job* job = m_searchDateCustomerPairs.at(i).second->GetSpecificJob(m_searchDateCustomerPairs.at(i).first);
+                    UpdateListing(m_searchDateCustomerPairs.at(i).second->GetName(), m_searchDateCustomerPairs.at(i).second->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                                  job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::SearchSort(QString searchValue)
+{
+    //if the search bar is empty, it's been cleared/not being used
+    if(searchValue == "")
+    {
+        m_searchBeingUsed = false;
+    }
+    else
+    {
+        m_searchBeingUsed = true;
+    }
+    // clear table
+    ui->mainTable->setRowCount(0);
+    // clear list used for sorting by date while search is being used
+    m_searchDateCustomerPairs.clear();
+    // add jobs from customers whose names start with the search bar contents
+    foreach(Customer* customer, m_customers)
+    {
+        if(customer->GetName().startsWith(searchValue.toUpper()))
+        {
+            foreach(Job* job, customer->GetJobs())
+            {
+                //add to a list that will sort searched for jobs by date
+                m_searchDateCustomerPairs.push_back(qMakePair(job->GetDate(), customer));
+                UpdateListing(customer->GetName(), customer->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
                               job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
             }
         }
