@@ -33,6 +33,8 @@ private:
     NewCustomer* m_newCustomerDialog;
     ExistingCustomer* m_existingCustomerDialog;
     bool m_ascendingDateFlag;
+    bool m_jobDescendingDateFlag;
+    bool m_alphabeticalNameFlag;
     bool m_searchBeingUsed;
     void HideJobsTableShowMainTable();
     void ShowJobsTableHideMainTable();
@@ -53,7 +55,9 @@ private slots:
     void on_addButton_clicked();
     void on_deleteButton_clicked();
     void SortByDate(int);
-    void SearchSort(QString);
+    void SortByName(int);
+    void SortJobsTableByDate(int);
+    void SortSearched(QString);
 
 signals:
     void SendCustomerName(QString name);

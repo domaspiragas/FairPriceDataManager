@@ -42,10 +42,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionNew_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenNewCustomerDialog()));
     connect(ui->actionExisting_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenExistingCustomerDialog()));
     connect(ui->backButton, SIGNAL(clicked(bool)), this, SLOT(GoBack()));
+
     connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByDate(int)));
+    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByName(int)));
 
-    connect(ui->searchBox, SIGNAL(textEdited(QString)), this, SLOT(SearchSort(QString)));
+    connect(ui->searchBox, SIGNAL(textEdited(QString)), this, SLOT(SortSearched(QString)));
 
+    connect(ui->jobsTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortJobsTableByDate(int)));
 
     /*FOR TESTING*/
     m_customers["SOMETHING"] = new Customer("SOMETHING", "911");
@@ -64,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
     AddJob("ZED","2011/02/30", new Car("1920","ford","focus"),"struts", "2", "100");
     AddJob("ZED", "2005/11/10", new Car("1980","toyota","focus"),"brakes", "2", "150");
 
+    m_customerNames << "SOMETHING" << "NAME" << "ZED" << "CUSTOMER";
     Load();
 
 }
@@ -116,6 +120,7 @@ void MainWindow::GoBack()
 {
     //clear jobs table
     ui->jobsTable->setRowCount(0);
+    m_jobDescendingDateFlag = false;
     HideJobsTableShowMainTable();
     Load();
 }
@@ -276,6 +281,7 @@ void MainWindow::Load()
     {
         foreach(Customer* customer, m_customers)
         {
+            //This will cause Duplicate entries in drop down for now, because load is used in GoBack()
             emit SendCustomerName(customer->GetName());
             foreach(Job* job, customer->GetJobs())
             {
@@ -371,8 +377,43 @@ void MainWindow::SortByDate(int section)
         }
     }
 }
+void MainWindow::SortByName(int section)
+{
+    if(section == 1)
+    {
+        // Sort the list of names
+        std::sort(m_customerNames.begin(), m_customerNames.end(), [] (QString& lhs, QString& rhs) {
+            return lhs < rhs;
+        });
 
-void MainWindow::SearchSort(QString searchValue)
+        ui->mainTable->setRowCount(0);
+        //handles alphabetical vs reverse-alphabetical
+        m_alphabeticalNameFlag = !m_alphabeticalNameFlag;
+        if(!m_alphabeticalNameFlag)
+        {
+            foreach(QString customerName, m_customerNames)
+            {
+                foreach(Job* job, m_customers[customerName]->GetJobs())
+                {
+                    UpdateListing(customerName, m_customers[customerName]->GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                                  job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+                }
+            }
+        }
+        else
+        {
+            for(int i = m_customerNames.size()-1; i >= 0 ; i--)
+            {
+                foreach(Job* job, m_customers[m_customerNames[i]]->GetJobs())
+                {
+                    UpdateListing(m_customerNames[i], m_customers[m_customerNames[i]]->GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(),
+                            job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+                }
+            }
+        }
+    }
+}
+void MainWindow::SortSearched(QString searchValue)
 {
     //if the search bar is empty, it's been cleared/not being used
     if(searchValue == "")
@@ -399,6 +440,58 @@ void MainWindow::SearchSort(QString searchValue)
                 UpdateListing(customer->GetName(), customer->GetPhoneNumber(),job->GetCar()->GetYear(), job->GetCar()->GetMake(),
                               job->GetCar()->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
             }
+        }
+    }
+}
+void MainWindow::SortJobsTableByDate(int section)
+{
+    // if date header is pressed
+    if(section == 0)
+    {
+        ui->jobsTable->setRowCount(0);
+
+        m_jobDescendingDateFlag = !m_jobDescendingDateFlag;
+
+        foreach(Job* job, m_customers[ui->nameLabel->text()]->GetJobs())
+        {
+
+            QTableWidgetItem* date_ = new QTableWidgetItem(job->GetDate());
+            date_->setFlags(date_->flags() ^ Qt::ItemIsEditable);
+            QTableWidgetItem* car_ = new QTableWidgetItem(job->GetCar()->GetYear() + " " + job->GetCar()->GetMake() + " " + job->GetCar()->GetModel());
+            car_->setFlags(car_->flags() ^ Qt::ItemIsEditable);
+            QTableWidgetItem* work_ = new QTableWidgetItem(job->GetWork());
+            work_->setFlags(work_->flags() ^ Qt::ItemIsEditable);
+            QTableWidgetItem* hours_ = new QTableWidgetItem(job->GetHours());
+            hours_->setFlags(hours_->flags() ^ Qt::ItemIsEditable);
+            QTableWidgetItem* price_ = new QTableWidgetItem(job->GetPrice());
+            price_->setFlags(price_->flags() ^ Qt::ItemIsEditable);
+            QTableWidgetItem* remove_ = new QTableWidgetItem("X");
+            remove_->setFlags(remove_->flags() ^ Qt::ItemIsEditable);
+
+            // use flag to swap from oldest-top to oldest-bottom
+            if(!m_jobDescendingDateFlag)
+            {
+                ui->jobsTable->insertRow(ui->jobsTable->rowCount());
+
+                ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,0,date_);
+                ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,1,car_);
+                ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,2,work_);
+                ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,3,hours_);
+                ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,4,price_);
+                ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,5,remove_);
+            }
+            else
+            {
+                ui->jobsTable->insertRow(0);
+
+                ui->jobsTable->setItem(0,0,date_);
+                ui->jobsTable->setItem(0,1,car_);
+                ui->jobsTable->setItem(0,2,work_);
+                ui->jobsTable->setItem(0,3,hours_);
+                ui->jobsTable->setItem(0,4,price_);
+                ui->jobsTable->setItem(0,5,remove_);
+            }
+
         }
     }
 }

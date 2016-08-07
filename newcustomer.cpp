@@ -21,8 +21,8 @@ void NewCustomer::ReceiveCloseRequest()
 
 void NewCustomer::on_submitButton_clicked()
 {
-    emit NewCustomerInfo(ui->customerNameBox->text().toUpper(), ui->customerPhoneNumberBox->text(), ui->carYearBox->text(), ui->carMakeBox->text(),
-                         ui->carModelBox->text(), ui->jobWorkBox->text(), ui->jobHoursBox->text(), ui->jobPriceBox->text(), ui->jobDateBox->text());
+    emit NewCustomerInfo(ui->customerNameBox->text().toUpper(), ui->customerPhoneNumberBox->text(), ui->carYearBox->text().toUpper(), ui->carMakeBox->text().toUpper(),
+                         ui->carModelBox->text().toUpper(), ui->jobWorkBox->text().toUpper(), ui->jobHoursBox->text(), ui->jobPriceBox->text(), ui->jobDateBox->text());
 }
 
 void NewCustomer::on_cancelButton_clicked()
