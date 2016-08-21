@@ -46,9 +46,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByDate(int)));
     connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByName(int)));
 
-    connect(ui->searchBox, SIGNAL(textEdited(QString)), this, SLOT(SortSearched(QString)));
+    connect(ui->searchBox, SIGNAL(textChanged(QString)), this, SLOT(SortSearched(QString)));
 
     connect(ui->jobsTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortJobsTableByDate(int)));
+
+    connect(ui->undoButton, SIGNAL(clicked(bool)), this, SLOT(HandleUndo()));
+    connect(ui->redoButton, SIGNAL(clicked(bool)), this, SLOT(HandleRedo()));
 
     /*FOR TESTING*/
     m_customers["SOMETHING"] = new Customer("SOMETHING", "911");
@@ -90,6 +93,9 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
         // Click on Remove
         else if(col == 7)
         {
+            //add a Pair containing Pair of Customer Name and Job that is going to be removed to undo Stack and a bool of whether it was removed
+            undoStack.push(qMakePair(qMakePair(ui->mainTable->item(row,1)->text(), m_customers[ui->mainTable->item(row, 1)->text()]->GetSpecificJob(ui->mainTable->item(row,0)->text())), true));
+
             m_customers[ui->mainTable->item(row, 1)->text()]->RemoveJob(ui->mainTable->item(row, 0)->text());
             //remove from m_dateCustomerPairs O of N, but best solution for now
             for(int i = 0; i< m_dateCustomerPairs.size(); i++)
@@ -108,9 +114,11 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
     // the jobs table is showing
     else if (ui->jobsTable->isVisible())
     {
-        // col 5 is the "remove buttons"
+        // col 5 is the "remove button" column
         if(col == 5)
         {
+            //add a Pair containing Pair of Customer Name and Job that is going to be removed to undo Stack and a bool of whether it was removed
+            undoStack.push(qMakePair(qMakePair(ui->nameLabel->text(), m_customers[ui->nameLabel->text()]->GetSpecificJob(ui->jobsTable->item(row,0)->text())), true));
             m_customers[ui->nameLabel->text()]->RemoveJob(ui->jobsTable->item(row, 0)->text());
             ui->jobsTable->removeRow(row);
         }
@@ -139,7 +147,9 @@ void MainWindow::AddJob(QString name, QString date, Car* car, QString work, QStr
 
     m_dateCustomerPairs.push_back(qMakePair(date, m_customers[name]));
 
-
+    //manage undo/redo stacks
+    undoStack.push(qMakePair(qMakePair(name, m_customers[name]->GetSpecificJob(date)), false));
+    redoStack.clear();
 }
 void MainWindow::ReceiveNewCustomerInfo(QString  name, QString  phoneNumber, QString  year, QString  make, QString model,
                                         QString work, QString hours, QString price, QString date)
@@ -150,17 +160,26 @@ void MainWindow::ReceiveNewCustomerInfo(QString  name, QString  phoneNumber, QSt
         AddCustomer(name, phoneNumber);
     }
     AddJob(name, date, new Car(year, make, model), work, hours, price);
-    UpdateListing(name, phoneNumber, year, make, model, work, hours, price, date);
+    // if search is bein used will only update listing if the new listing matches the search criteria
+    if(ui->searchBox->text() == "" || name.startsWith(ui->searchBox->text().toUpper()))
+    {
+        UpdateListing(name, phoneNumber, year, make, model, work, hours, price, date);
+    }
     emit CloseNewCustWindow();
 }
 void MainWindow::ReceiveExistingCustomerInfo(QString name, QString year, QString make, QString model, QString work, QString hours, QString price, QString date)
 {
     AddJob(name, date, new Car(year, make, model), work, hours, price);
-    UpdateListing(name, m_customers[name]->GetPhoneNumber(), year, make, model, work, hours, price, date);
+    // if search is bein used will only update listing if the new listing matches the search criteria
+    if(ui->searchBox->text() == "" || name.startsWith(ui->searchBox->text().toUpper()))
+    {
+        UpdateListing(name, m_customers[name]->GetPhoneNumber(), year, make, model, work, hours, price, date);
+    }
     emit CloseExistingCustWindow();
 }
 void MainWindow::UpdateListing(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date)
 {
+
     QTableWidgetItem* date_ = new QTableWidgetItem(date);
     date_->setFlags(date_->flags() ^ Qt::ItemIsEditable);
     QTableWidgetItem* name_ = new QTableWidgetItem(name);
@@ -209,8 +228,8 @@ void MainWindow::HideJobsTableShowMainTable()
     //top bar
     ui->searchBox->show();
     ui->searchLabel->show();
-    ui->addButton->show();
-    ui->deleteButton->show();
+    ui->undoButton->show();
+    ui->redoButton->show();
 }
 void MainWindow::ShowJobsTableHideMainTable()
 {
@@ -222,18 +241,8 @@ void MainWindow::ShowJobsTableHideMainTable()
     //top bar
     ui->searchBox->hide();
     ui->searchLabel->hide();
-    ui->addButton->hide();
-    ui->deleteButton->hide();
-}
-
-void MainWindow::on_addButton_clicked()
-{
-    m_newCustomerDialog->show();
-}
-
-void MainWindow::on_deleteButton_clicked()
-{
-
+    ui->undoButton->hide();
+    ui->redoButton->hide();
 }
 
 void MainWindow::OpenJobsView(int row, int col)
@@ -494,4 +503,104 @@ void MainWindow::SortJobsTableByDate(int section)
 
         }
     }
+}
+void MainWindow::HandleUndo()
+{
+    if(!undoStack.isEmpty())
+    {
+        //store the value from the stack to access its values
+        QPair<QPair<QString, Job*>,bool> temp = undoStack.pop();
+        QString name = temp.first.first;
+        Job* job = temp.first.second;
+        Car* car = job->GetCar();
+        //add the undo to the redo stack
+        redoStack.push_back(temp);
+        //temp.second is a bool true means job was removed, false means it was added
+        if(temp.second)
+        {
+            //TODO: Could possibly overload AddJob to take in Name and Job parameters
+            // Add the job that was removed (can't call MainWindow's AddJob function because it'll be added to the undo stack again
+            m_customers[name]->AddJob(job);
+            m_dateCustomerPairs.push_back(qMakePair(job->GetDate(), m_customers[name]));
+            UpdateListing(name, m_customers[name]->GetPhoneNumber(),car->GetYear(),car->GetMake(), car->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+        }
+        // temp.second was false something was added, so we must remove it
+        else
+        {
+            m_customers[name]->RemoveJob(job->GetDate());
+
+            //remove from m_dateCustomerPairs O of N, but best solution for now
+            for(int i = 0; i< m_dateCustomerPairs.size(); i++)
+            {
+                // if the date and name are the same as the row clicked, remove that QPair from list
+                if(m_dateCustomerPairs[i].first == job->GetDate() && m_dateCustomerPairs[i].second->GetName() == name)
+                {
+                    m_dateCustomerPairs.removeAt(i);
+                    // end once found and removed
+                    break;
+                }
+            }
+
+            for(int j = 0; j < ui->mainTable->rowCount(); j++)
+            {
+                // if the customer and date are the same we know we're at the correct row
+                if(ui->mainTable->item(j, 0)->text() == job->GetDate() && ui->mainTable->item(j, 1)->text() == name)
+                {
+                    ui->mainTable->removeRow(j);
+                    //once  we've found our row, finish searching
+                    break;
+                }
+            }
+        }
+    }
+}
+void MainWindow::HandleRedo()
+{
+    // The bool values in the redo stack will have the opposite meaning of the undo stack, so true means it was added, false means it was removed
+    if(!redoStack.isEmpty())
+    {
+        //store the value from the stack to access its values
+        QPair<QPair<QString, Job*>,bool> temp = redoStack.pop();
+        QString name = temp.first.first;
+        Job* job = temp.first.second;
+        Car* car = job->GetCar();
+        undoStack.push_back(temp);
+        if(!temp.second)
+        {
+            //TODO: Could possibly overload AddJob to take in Name and Job parameters
+            // Add the job that was removed (Can't call MainWindow's AddJob Method because it will be added to the undo stack again
+            m_customers[name]->AddJob(job);
+            m_dateCustomerPairs.push_back(qMakePair(job->GetDate(), m_customers[name]));
+            UpdateListing(name, m_customers[name]->GetPhoneNumber(),car->GetYear(),car->GetMake(), car->GetModel(), job->GetWork(), job->GetHours(), job->GetPrice(), job->GetDate());
+        }
+        // temp.second was false something was added, so we must remove it
+        else
+        {
+            m_customers[name]->RemoveJob(job->GetDate());
+
+            //remove from m_dateCustomerPairs O of N, but best solution for now
+            for(int i = 0; i< m_dateCustomerPairs.size(); i++)
+            {
+                // if the date and name are the same as the row clicked, remove that QPair from list
+                if(m_dateCustomerPairs[i].first == job->GetDate() && m_dateCustomerPairs[i].second->GetName() == name)
+                {
+                    m_dateCustomerPairs.removeAt(i);
+                    // end once found and removed
+                    break;
+                }
+            }
+
+            for(int j = 0; j < ui->mainTable->rowCount(); j++)
+            {
+                // if the customer and date are the same we know we're at the correct row
+                if(ui->mainTable->item(j, 0)->text() == job->GetDate() && ui->mainTable->item(j, 1)->text() == name)
+                {
+                    ui->mainTable->removeRow(j);
+                    //once  we've found our row, finish searching
+                    break;
+                }
+            }
+        }
+    }
+
 }

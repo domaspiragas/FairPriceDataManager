@@ -17,11 +17,15 @@ public:
 
 private slots:
     void ReceiveCloseRequest();
+    void ForceDateFormat(QString textEntered);
+    void ForcePhoneNumberFormat(QString textEntered);
     void on_submitButton_clicked();
     void on_cancelButton_clicked();
 
 private:
     Ui::NewCustomer *ui;
+    int dateBoxTextLength;
+    int phoneNumberBoxTextLength;
     void ClearClose();
 
 signals:

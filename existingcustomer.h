@@ -17,11 +17,13 @@ public:
 
 private:
     Ui::ExistingCustomer *ui;
+    int dateBoxTextLength;
     void ClearClose();
 
 private slots:
     void AddCustomerToList(QString name);
     void ReceiveCloseRequest();
+    void ForceDateFormat(QString textEntered);
     void on_submitButton_clicked();
     void on_cancelButton_clicked();
 

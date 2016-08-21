@@ -224,6 +224,18 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>customerComboBox</tabstop>
+  <tabstop>carYearBox</tabstop>
+  <tabstop>carMakeBox</tabstop>
+  <tabstop>carModelBox</tabstop>
+  <tabstop>jobWorkBox</tabstop>
+  <tabstop>jobHoursBox</tabstop>
+  <tabstop>jobPriceBox</tabstop>
+  <tabstop>jobDateBox</tabstop>
+  <tabstop>submitButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

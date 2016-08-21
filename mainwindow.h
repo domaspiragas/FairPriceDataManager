@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QMap>
 #include <QSet>
+#include <QStack>
 #include "customer.h"
 #include "newcustomer.h"
 #include "existingcustomer.h"
@@ -30,6 +31,9 @@ private:
     QList<QString> m_customerNames;
     QList<QPair<QString, Customer*>> m_dateCustomerPairs;
     QList<QPair<QString, Customer*>> m_searchDateCustomerPairs;
+    //Undo And Redo Stacks, QPair<QPair<CustomerName, Job>, bool(removed == true, added == false)>
+    QStack<QPair<QPair<QString, Job*>, bool>> undoStack;
+    QStack<QPair<QPair<QString, Job*>, bool>> redoStack;
     NewCustomer* m_newCustomerDialog;
     ExistingCustomer* m_existingCustomerDialog;
     bool m_ascendingDateFlag;
@@ -52,12 +56,12 @@ private slots:
     void ReceiveExistingCustomerInfo(QString name, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
     void OpenNewCustomerDialog();
     void OpenExistingCustomerDialog();
-    void on_addButton_clicked();
-    void on_deleteButton_clicked();
     void SortByDate(int);
     void SortByName(int);
     void SortJobsTableByDate(int);
     void SortSearched(QString);
+    void HandleUndo();
+    void HandleRedo();
 
 signals:
     void SendCustomerName(QString name);
