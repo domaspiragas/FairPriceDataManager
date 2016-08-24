@@ -7,6 +7,12 @@ NewCustomer::NewCustomer(QWidget *parent) :
     ui(new Ui::NewCustomer)
 {
     ui->setupUi(this);
+    //Set main background color
+    QPalette pal = palette();
+    pal.setColor( QPalette::Window, QColor("#333333"));
+    setPalette( pal );
+    connect(ui->jobDateBox, SIGNAL(textEdited(QString)), this, SLOT(ForceDateFormat(QString)));
+
     connect(ui->jobDateBox, SIGNAL(textEdited(QString)), this, SLOT(ForceDateFormat(QString)));
     connect(ui->customerPhoneNumberBox, SIGNAL(textEdited(QString)), this, SLOT(ForcePhoneNumberFormat(QString)));
 }

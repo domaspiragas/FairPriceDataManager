@@ -6,223 +6,417 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>316</height>
+    <width>475</width>
+    <height>300</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>475</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>475</width>
+    <height>300</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QPushButton" name="submitButton">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>270</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Submit</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="cancelButton">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>270</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="customerComboBox">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>40</y>
-     <width>151</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>20</y>
-     <width>51</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Customer</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="carYearBox">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>130</y>
-     <width>113</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="carMakeBox">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>130</y>
-     <width>113</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="carModelBox">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>130</y>
-     <width>113</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="jobPriceBox">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>210</y>
-     <width>113</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="jobWorkBox">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>210</y>
-     <width>113</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="jobHoursBox">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>210</y>
-     <width>113</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="carYearLabel">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>100</y>
-     <width>51</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Year</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="carMakeLabel">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>100</y>
-     <width>51</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Make</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="carModelLabel">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>100</y>
-     <width>51</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Model</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="jobPriceLabel">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>180</y>
-     <width>51</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Price</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="jobWorkLabel">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>180</y>
-     <width>51</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Work</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="jobHoursLabel">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>180</y>
-     <width>51</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Hours</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="jobDateBox">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>270</y>
-     <width>113</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="jobDateLabel">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>250</y>
-     <width>47</width>
-     <height>13</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Date</string>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="customerBox">
+     <property name="minimumSize">
+      <size>
+       <width>160</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>65</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QWidget
+{
+	font-size:14px;
+	border: 2px solid #1a1a1a;
+}
+
+QWidget::title 
+{
+	color:#fffff8;
+
+}</string>
+     </property>
+     <property name="title">
+      <string>Customer</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QComboBox" name="customerComboBox">
+        <property name="minimumSize">
+         <size>
+          <width>107</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QComboBox 
+{
+	border: 2px solid #1a1a1a;
+	background-color: #646464;	
+	color: #fffff8;
+	font-size:12px;
+}
+
+QComboBox QAbstractItemView
+{
+background-color: #333333;
+selection-background-color:#646464; 
+border: 1px solid #fffff8;
+color: #fffff8;
+outline:0px;
+font: 12pt;
+}</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QGroupBox" name="carBox">
+       <property name="styleSheet">
+        <string notr="true">QWidget
+{
+	font-size:14px;
+	border: 2px solid #1a1a1a;
+
+}
+
+QWidget::title 
+{
+	color:#fffff8;
+}</string>
+       </property>
+       <property name="title">
+        <string>Car</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="carYearLabel">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	color: #fffff8;
+	border:none;
+	font-size:12px;
+}</string>
+            </property>
+            <property name="text">
+             <string>Year</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="carMakeBox">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	background-color: #646464;
+	color: white;
+	border: 2px solid #1a1a1a;
+	font-size:12px;
+}</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="carMakeLabel">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	color: #fffff8;
+	border:none;
+	font-size:12px;
+}</string>
+            </property>
+            <property name="text">
+             <string>Make</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="carYearBox">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	background-color: #646464;
+	color: white;
+	border: 2px solid #1a1a1a;
+	font-size:12px;
+}</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="carModelLabel">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	color: #fffff8;
+	border:none;
+	font-size:12px;
+}</string>
+            </property>
+            <property name="text">
+             <string>Model</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="carModelBox">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	background-color: #646464;
+	color: white;
+	border: 2px solid #1a1a1a;
+	font-size:12px;
+}</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="jobBox">
+       <property name="styleSheet">
+        <string notr="true">QWidget
+{
+	font-size:14px;
+	border: 2px solid #1a1a1a;
+}
+
+QWidget::title 
+{
+	color:#fffff8;
+
+}</string>
+       </property>
+       <property name="title">
+        <string>Job</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="jobWorkBox">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	background-color: #646464;
+	color: white;
+	border: 2px solid #1a1a1a;
+	font-size:12px;
+}</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="jobWorkLabel">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	color: #fffff8;
+	border:none;
+	font-size:12px;
+}</string>
+            </property>
+            <property name="text">
+             <string>Work</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="jobDateBox">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	background-color: #646464;
+	color: white;
+	border: 2px solid #1a1a1a;
+	font-size:12px;
+}</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="jobPriceBox">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	background-color: #646464;
+	color: white;
+	border: 2px solid #1a1a1a;
+	font-size:12px;
+}</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="jobHoursBox">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	background-color: #646464;
+	color: white;
+	border: 2px solid #1a1a1a;
+	font-size:12px;
+}</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="jobHoursLabel">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	color: #fffff8;
+	border:none;
+	font-size:12px;
+}</string>
+            </property>
+            <property name="text">
+             <string>Hours</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="jobDateLabel">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	color: #fffff8;
+	border:none;
+	font-size:12px;
+}</string>
+            </property>
+            <property name="text">
+             <string>Date</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="jobPriceLabel">
+            <property name="styleSheet">
+             <string notr="true">QWidget 
+{
+	color: #fffff8;
+	border:none;
+	font-size:12px;
+}</string>
+            </property>
+            <property name="text">
+             <string>Price</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="submitButton">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton
+{
+	background-color: #1a1a1a;
+	color: white;
+	border: 1px solid #fffff8;
+	border-radius: 1px
+}
+QPushButton:pressed 
+{
+	background-color:#646464;
+	color:white;
+	border: 1px solid #fffff8;
+	border-radius: 1px;
+}</string>
+       </property>
+       <property name="text">
+        <string>Submit</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton
+{
+	background-color: #1a1a1a;
+	color: white;
+	border: 1px solid #fffff8;
+	border-radius: 1px
+}
+QPushButton:pressed 
+{
+	background-color:#646464;
+	color:white;
+	border: 1px solid #fffff8;
+	border-radius: 1px;
+}</string>
+       </property>
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <tabstops>
   <tabstop>customerComboBox</tabstop>

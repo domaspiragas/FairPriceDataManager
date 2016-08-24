@@ -7,12 +7,17 @@ ExistingCustomer::ExistingCustomer(QWidget *parent) :
     ui(new Ui::ExistingCustomer)
 {
     ui->setupUi(this);
+    //Set main background color
+    QPalette pal = palette();
+    pal.setColor( QPalette::Window, QColor("#333333"));
+    setPalette( pal );
     connect(ui->jobDateBox, SIGNAL(textEdited(QString)), this, SLOT(ForceDateFormat(QString)));
 }
 
 ExistingCustomer::~ExistingCustomer()
 {
     delete ui;
+
 }
 
 void ExistingCustomer::AddCustomerToList(QString name)

@@ -1,5 +1,7 @@
 #include "job.h"
 
+Job::Job(){}
+
 Job::Job(QString date, Car* car, QString work, QString hours, QString price)
 {
     m_date = date;
@@ -10,23 +12,23 @@ Job::Job(QString date, Car* car, QString work, QString hours, QString price)
 }
 Job::~Job(){}
 // Getters for Member Variables
-QString Job::GetDate()
+QString Job::GetDate() const
 {
     return m_date;
 }
-Car* Job::GetCar()
+Car* Job::GetCar() const
 {
     return m_car;
 }
-QString Job::GetWork()
+QString Job::GetWork() const
 {
     return m_work;
 }
-QString Job::GetHours()
+QString Job::GetHours() const
 {
     return m_hours;
 }
-QString Job::GetPrice()
+QString Job::GetPrice() const
 {
     return m_price;
 }
@@ -50,4 +52,21 @@ void Job::SetHours(QString hours)
 void Job::SetPrice(QString price)
 {
     m_price = price;
+}
+
+QDataStream &operator<<(QDataStream &out, const Job &job)
+{
+    out << job.GetDate() << *job.GetCar() << job.GetWork() << job.GetHours() << job.GetPrice();
+    return out;
+}
+QDataStream &operator>>(QDataStream &in, Job &job)
+{
+    QString date;
+    Car car;
+    QString work;
+    QString hours;
+    QString price;
+    in >> date >> car >> work >> hours >> price;
+    job = Job(date, new Car(car.GetYear(), car.GetMake(), car.GetModel()), work, hours, price);
+    return in;
 }

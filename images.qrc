@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/logo">
+        <file>Images/WhiteWindow.png</file>
+        <file>Images/CarIcon.png</file>
+    </qresource>
+</RCC>

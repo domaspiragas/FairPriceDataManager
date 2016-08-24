@@ -10,6 +10,7 @@
 #include "customer.h"
 #include "newcustomer.h"
 #include "existingcustomer.h"
+#include <QCloseEvent>
 
 namespace Ui {
 class MainWindow;
@@ -40,12 +41,15 @@ private:
     bool m_jobDescendingDateFlag;
     bool m_alphabeticalNameFlag;
     bool m_searchBeingUsed;
+    bool m_unsavedChanges;
     void HideJobsTableShowMainTable();
     void ShowJobsTableHideMainTable();
     void UpdateListing(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date);
     void OpenJobsView(int row, int col);
     void Load();
 
+protected:
+     void closeEvent(QCloseEvent *event);
 
 private slots:
     void GoBack();
@@ -62,11 +66,15 @@ private slots:
     void SortSearched(QString);
     void HandleUndo();
     void HandleRedo();
+    void Save();
+    void LoadFromFile();
+
 
 signals:
     void SendCustomerName(QString name);
     void CloseNewCustWindow();
     void CloseExistingCustWindow();
+
 };
 
 #endif // MAINWINDOW_H

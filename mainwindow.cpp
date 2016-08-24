@@ -5,13 +5,22 @@
 #include <QTableWidget>
 #include <QPushButton>
 #include <QDebug>
-
+#include <QFile>
+#include <QDataStream>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    //Set main window background color - stylesheet breaks header style
+    QPalette pal = palette();
+    pal.setColor( QPalette::Window, QColor("#646464"));
+    setPalette( pal );
+    //set icon
+    this->setWindowIcon(QIcon(":/logo/Images/CarIcon.png"));
 
     m_newCustomerDialog = new NewCustomer();
     m_existingCustomerDialog = new ExistingCustomer();
@@ -50,28 +59,32 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->jobsTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortJobsTableByDate(int)));
 
-    connect(ui->undoButton, SIGNAL(clicked(bool)), this, SLOT(HandleUndo()));
-    connect(ui->redoButton, SIGNAL(clicked(bool)), this, SLOT(HandleRedo()));
+    connect(ui->actionUndo, SIGNAL(triggered(bool)), this, SLOT(HandleUndo()));
+    connect(ui->actionRedo, SIGNAL(triggered(bool)), this, SLOT(HandleRedo()));
 
-    /*FOR TESTING*/
-    m_customers["SOMETHING"] = new Customer("SOMETHING", "911");
-    AddJob("SOMETHING", "2016/12/30", new Car("1920","ford","focus"),"struts", "2", "100");
-    AddJob("SOMETHING", "2015/08/15", new Car("1980","toyota","focus"),"brakes", "2", "150");
+    connect(ui->actionSave, SIGNAL(triggered(bool)), this, SLOT(Save()));
 
-    m_customers["NAME"] = new Customer("NAME", "911-2500-50");
-    AddJob("NAME","1995/08/09", new Car("1820","ford","taurus"),"alternator", "2", "150");
-    AddJob("NAME","1985/07/12", new Car("1950","toyota","carname"),"brakes", "2", "150");
 
-    m_customers["CUSTOMER"] = new Customer("CUSTOMER", "800-555-5555");
-    AddJob("CUSTOMER","2011/02/30", new Car("1855","ford","focus"),"struts", "2", "100");
-    AddJob("CUSTOMER","2016/12/31", new Car("1980","toyota","focus"),"brakes", "2", "150");
+    //    /*FOR TESTING*/
+    //    m_customers["SOMETHING"] = new Customer("SOMETHING", "911");
+    //    AddJob("SOMETHING", "2016/12/30", new Car("1920","ford","focus"),"struts", "2", "100");
+    //    AddJob("SOMETHING", "2015/08/15", new Car("1980","toyota","focus"),"brakes", "2", "150");
 
-    m_customers["ZED"] = new Customer("ZED", "911");
-    AddJob("ZED","2011/02/30", new Car("1920","ford","focus"),"struts", "2", "100");
-    AddJob("ZED", "2005/11/10", new Car("1980","toyota","focus"),"brakes", "2", "150");
+    //    m_customers["NAME"] = new Customer("NAME", "911-2500-50");
+    //    AddJob("NAME","1995/08/09", new Car("1820","ford","taurus"),"alternator", "2", "150");
+    //    AddJob("NAME","1985/07/12", new Car("1950","toyota","carname"),"brakes", "2", "150");
 
-    m_customerNames << "SOMETHING" << "NAME" << "ZED" << "CUSTOMER";
-    Load();
+    //    m_customers["CUSTOMER"] = new Customer("CUSTOMER", "800-555-5555");
+    //    AddJob("CUSTOMER","2011/02/30", new Car("1855","ford","focus"),"struts", "2", "100");
+    //    AddJob("CUSTOMER","2016/12/31", new Car("1980","toyota","focus"),"brakes", "2", "150");
+
+    //    m_customers["ZED"] = new Customer("ZED", "911");
+    //    AddJob("ZED","2011/02/30", new Car("1920","ford","focus"),"struts", "2", "100");
+    //    AddJob("ZED", "2005/11/10", new Car("1980","toyota","focus"),"brakes", "2", "150");
+
+    //    m_customerNames << "SOMETHING" << "NAME" << "ZED" << "CUSTOMER";
+    //    Load();
+    LoadFromFile();
 
 }
 
@@ -97,6 +110,11 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
             undoStack.push(qMakePair(qMakePair(ui->mainTable->item(row,1)->text(), m_customers[ui->mainTable->item(row, 1)->text()]->GetSpecificJob(ui->mainTable->item(row,0)->text())), true));
 
             m_customers[ui->mainTable->item(row, 1)->text()]->RemoveJob(ui->mainTable->item(row, 0)->text());
+            //if that was the customer's only job, remove customer
+            if(m_customers[ui->mainTable->item(row,1)->text()]->GetJobs().size() == 0)
+            {
+                m_customers.remove(ui->mainTable->item(row,1)->text());
+            }
             //remove from m_dateCustomerPairs O of N, but best solution for now
             for(int i = 0; i< m_dateCustomerPairs.size(); i++)
             {
@@ -109,6 +127,7 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
                 }
             }
             ui->mainTable->removeRow(row);
+            m_unsavedChanges = true;
         }
     }
     // the jobs table is showing
@@ -121,6 +140,7 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
             undoStack.push(qMakePair(qMakePair(ui->nameLabel->text(), m_customers[ui->nameLabel->text()]->GetSpecificJob(ui->jobsTable->item(row,0)->text())), true));
             m_customers[ui->nameLabel->text()]->RemoveJob(ui->jobsTable->item(row, 0)->text());
             ui->jobsTable->removeRow(row);
+            m_unsavedChanges = true;
         }
     }
 }
@@ -150,6 +170,7 @@ void MainWindow::AddJob(QString name, QString date, Car* car, QString work, QStr
     //manage undo/redo stacks
     undoStack.push(qMakePair(qMakePair(name, m_customers[name]->GetSpecificJob(date)), false));
     redoStack.clear();
+    m_unsavedChanges = true;
 }
 void MainWindow::ReceiveNewCustomerInfo(QString  name, QString  phoneNumber, QString  year, QString  make, QString model,
                                         QString work, QString hours, QString price, QString date)
@@ -228,8 +249,6 @@ void MainWindow::HideJobsTableShowMainTable()
     //top bar
     ui->searchBox->show();
     ui->searchLabel->show();
-    ui->undoButton->show();
-    ui->redoButton->show();
 }
 void MainWindow::ShowJobsTableHideMainTable()
 {
@@ -241,8 +260,6 @@ void MainWindow::ShowJobsTableHideMainTable()
     //top bar
     ui->searchBox->hide();
     ui->searchLabel->hide();
-    ui->undoButton->hide();
-    ui->redoButton->hide();
 }
 
 void MainWindow::OpenJobsView(int row, int col)
@@ -290,8 +307,6 @@ void MainWindow::Load()
     {
         foreach(Customer* customer, m_customers)
         {
-            //This will cause Duplicate entries in drop down for now, because load is used in GoBack()
-            emit SendCustomerName(customer->GetName());
             foreach(Job* job, customer->GetJobs())
             {
                 UpdateListing(customer->GetName(), customer->GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(),
@@ -602,5 +617,95 @@ void MainWindow::HandleRedo()
             }
         }
     }
+}
 
+void MainWindow::Save()
+{
+    // create or open the file to save in
+    QFile file("FairPriceData.dat");
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        return;
+    }
+    // data stream that writes to the file
+    QDataStream stream (&file);
+    stream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+
+    //can't serialize w/ pointers, create map w/o pointers
+    QMap<QString, Customer> tempCustomers;
+    foreach(Customer* customer, m_customers)
+    {
+        tempCustomers[customer->GetName()] = *customer;
+    }
+    // serialize the temp storage for customers
+    stream << tempCustomers;
+    file.close();
+    m_unsavedChanges = false;
+}
+
+void MainWindow::LoadFromFile()
+{
+    //clear the table and data structures before loading
+    m_customers.clear();
+    m_customerNames.clear();
+    m_dateCustomerPairs.clear();
+    ui->mainTable->setRowCount(0);
+
+    //create or open the file to load from
+    QFile file("FairPriceData.dat");
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        return;
+    }
+    //data stream that reads the file
+    QDataStream stream (&file);
+    stream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+
+    // a temp data structure to store customer objects rather than pointers since we can't (de)serialize pointers
+    QMap<QString, Customer> tempCustomers;
+
+    //actual reading of the file
+    stream >> tempCustomers;
+
+    //loop through the temp storage read in from file, and translate it over to the main data storage w/ pointers in m_customers
+    foreach(Customer customer, tempCustomers)
+    {
+        if(!m_customerNames.contains(customer.GetName()))
+        {
+            AddCustomer(customer.GetName(), customer.GetPhoneNumber());
+        }
+        foreach(Job* job, customer.GetJobs())
+        {
+            AddJob(customer.GetName(), job->GetDate(), job->GetCar(), job->GetWork(), job->GetHours(), job->GetPrice());
+            UpdateListing(customer.GetName(), customer.GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(), job->GetCar()->GetModel(), job->GetWork(), job->GetHours(),
+                          job->GetPrice(), job->GetDate());
+        }
+    }
+    file.close();
+    // clear undo since AddJob adds to the stack
+    undoStack.clear();
+    m_unsavedChanges = false;
+}
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    if(m_unsavedChanges)
+    {
+        QMessageBox::StandardButton exitWithoutSaving = QMessageBox::question( this, "Fair Price Data Manager",
+                                                                    tr("You have unsaved changes\nWould you like to save before exiting?"),
+                                                                    QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::Yes);
+        if (exitWithoutSaving == QMessageBox::Yes)
+        {
+            Save();
+            event->accept();
+        }
+        else if(exitWithoutSaving == QMessageBox::No)
+        {
+            event->accept();
+        }
+        else
+        {
+            event->ignore();
+        }
+    }
 }

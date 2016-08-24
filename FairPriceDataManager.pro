@@ -30,3 +30,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     newcustomer.ui \
     existingcustomer.ui
+
+RESOURCES += \
+    images.qrc

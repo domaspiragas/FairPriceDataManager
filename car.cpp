@@ -10,15 +10,15 @@ Car::Car(QString year, QString make, QString model)
 }
 
 // Getters for Member Variables
-QString Car::GetYear()
+QString Car::GetYear() const
 {
     return m_year;
 }
-QString Car::GetMake()
+QString Car::GetMake() const
 {
     return m_make;
 }
-QString Car::GetModel()
+QString Car::GetModel() const
 {
     return m_model;
 }
@@ -34,4 +34,19 @@ void Car::SetMake(QString make)
 void Car::SetModel(QString model)
 {
     m_model = model;
+}
+
+QDataStream &operator<<(QDataStream &out, const Car &car)
+{
+    out << car.GetYear() << car.GetMake() << car.GetModel();
+    return out;
+}
+QDataStream &operator>>(QDataStream &in, Car &car)
+{
+    QString year;
+    QString make;
+    QString model;
+    in >> year >> make >> model;
+    car = Car(year, make, model);
+    return in;
 }
