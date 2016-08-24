@@ -24,8 +24,8 @@ private slots:
 
 private:
     Ui::NewCustomer *ui;
-    int dateBoxTextLength;
-    int phoneNumberBoxTextLength;
+    int m_dateBoxTextLength;
+    int m_phoneNumberBoxTextLength;
     void ClearClose();
 
 signals:

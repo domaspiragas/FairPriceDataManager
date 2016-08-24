@@ -17,7 +17,7 @@ public:
 
 private:
     Ui::ExistingCustomer *ui;
-    int dateBoxTextLength;
+    int m_dateBoxTextLength;
     void ClearClose();
 
 private slots:

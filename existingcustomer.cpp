@@ -11,6 +11,9 @@ ExistingCustomer::ExistingCustomer(QWidget *parent) :
     QPalette pal = palette();
     pal.setColor( QPalette::Window, QColor("#333333"));
     setPalette( pal );
+    //set icon
+    this->setWindowIcon(QIcon(":/logo/Images/CarIcon.png"));
+    // Connect Slots and Signals
     connect(ui->jobDateBox, SIGNAL(textEdited(QString)), this, SLOT(ForceDateFormat(QString)));
 }
 
@@ -67,7 +70,7 @@ void ExistingCustomer::ForceDateFormat(QString textEntered)
         if(textEntered.size() ==  4 && ok)
         {
             // if 4th number is just added
-            if(dateBoxTextLength < textEntered.size())
+            if(m_dateBoxTextLength < textEntered.size())
             {
                 ui->jobDateBox->setText(textEntered + "/");
             }
@@ -93,7 +96,7 @@ void ExistingCustomer::ForceDateFormat(QString textEntered)
         if(textEntered.size()== 7 && ok)
         {
             // if 7th character is just added
-            if(dateBoxTextLength < textEntered.size())
+            if(m_dateBoxTextLength < textEntered.size())
             {
                 ui->jobDateBox->setText(textEntered + "/");
             }
@@ -119,5 +122,5 @@ void ExistingCustomer::ForceDateFormat(QString textEntered)
         ui->jobDateBox->setText(textEntered.left(textEntered.size()-1));
     }
     // keep track of current text size in box
-    dateBoxTextLength = ui->jobDateBox->text().size();
+    m_dateBoxTextLength = ui->jobDateBox->text().size();
 }

@@ -249,6 +249,7 @@ void MainWindow::HideJobsTableShowMainTable()
     //top bar
     ui->searchBox->show();
     ui->searchLabel->show();
+    ui->logo->show();
 }
 void MainWindow::ShowJobsTableHideMainTable()
 {
@@ -260,6 +261,7 @@ void MainWindow::ShowJobsTableHideMainTable()
     //top bar
     ui->searchBox->hide();
     ui->searchLabel->hide();
+    ui->logo->hide();
 }
 
 void MainWindow::OpenJobsView(int row, int col)

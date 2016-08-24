@@ -11,8 +11,9 @@ NewCustomer::NewCustomer(QWidget *parent) :
     QPalette pal = palette();
     pal.setColor( QPalette::Window, QColor("#333333"));
     setPalette( pal );
-    connect(ui->jobDateBox, SIGNAL(textEdited(QString)), this, SLOT(ForceDateFormat(QString)));
-
+    //set icon
+    this->setWindowIcon(QIcon(":/logo/Images/CarIcon.png"));
+    // Connect Slots and Signals
     connect(ui->jobDateBox, SIGNAL(textEdited(QString)), this, SLOT(ForceDateFormat(QString)));
     connect(ui->customerPhoneNumberBox, SIGNAL(textEdited(QString)), this, SLOT(ForcePhoneNumberFormat(QString)));
 }
@@ -70,7 +71,7 @@ void NewCustomer::ForceDateFormat(QString textEntered)
         if(textEntered.size() ==  4 && ok)
         {
             // if 4th number is just added
-            if(dateBoxTextLength < textEntered.size())
+            if(m_dateBoxTextLength < textEntered.size())
             {
                 ui->jobDateBox->setText(textEntered + "/");
             }
@@ -96,7 +97,7 @@ void NewCustomer::ForceDateFormat(QString textEntered)
         if(textEntered.size()== 7 && ok)
         {
             // if 7th character is just added
-            if(dateBoxTextLength < textEntered.size())
+            if(m_dateBoxTextLength < textEntered.size())
             {
                 ui->jobDateBox->setText(textEntered + "/");
             }
@@ -122,7 +123,7 @@ void NewCustomer::ForceDateFormat(QString textEntered)
         ui->jobDateBox->setText(textEntered.left(textEntered.size()-1));
     }
     // keep track of current text size in box
-    dateBoxTextLength = ui->jobDateBox->text().size();
+    m_dateBoxTextLength = ui->jobDateBox->text().size();
 }
 void NewCustomer::ForcePhoneNumberFormat(QString textEntered)
 {
@@ -139,7 +140,7 @@ void NewCustomer::ForcePhoneNumberFormat(QString textEntered)
         if(textEntered.size() ==  3 && ok)
         {
             // if 3rd number is just added
-            if(phoneNumberBoxTextLength < textEntered.size())
+            if(m_phoneNumberBoxTextLength < textEntered.size())
             {
                 ui->customerPhoneNumberBox->setText(textEntered + "-");
             }
@@ -164,7 +165,7 @@ void NewCustomer::ForcePhoneNumberFormat(QString textEntered)
         if(textEntered.size()== 7 && ok)
         {
             // if 7th character is just added add "-"
-            if(phoneNumberBoxTextLength < textEntered.size())
+            if(m_phoneNumberBoxTextLength < textEntered.size())
             {
                 ui->customerPhoneNumberBox->setText(textEntered + "-");
             }
@@ -180,5 +181,5 @@ void NewCustomer::ForcePhoneNumberFormat(QString textEntered)
     {
         ui->customerPhoneNumberBox->setText(textEntered.left(textEntered.size()-1));
     }
-    phoneNumberBoxTextLength = ui->customerPhoneNumberBox->text().size();
+    m_phoneNumberBoxTextLength = ui->customerPhoneNumberBox->text().size();
 }
