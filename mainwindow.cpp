@@ -6,8 +6,12 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #include <QDataStream>
 #include <QMessageBox>
+#include <QShortcut>
+#include <QDateTime>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -48,8 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(ReceiveExistingCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString)));
     connect(this, SIGNAL(CloseExistingCustWindow()), m_existingCustomerDialog, SLOT(ReceiveCloseRequest()));
     connect(this, SIGNAL(CloseNewCustWindow()), m_newCustomerDialog, SLOT(ReceiveCloseRequest()));
-    connect(ui->actionNew_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenNewCustomerDialog()));
-    connect(ui->actionExisting_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenExistingCustomerDialog()));
+
     connect(ui->backButton, SIGNAL(clicked(bool)), this, SLOT(GoBack()));
 
     connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByDate(int)));
@@ -58,32 +61,21 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->searchBox, SIGNAL(textChanged(QString)), this, SLOT(SortSearched(QString)));
 
     connect(ui->jobsTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortJobsTableByDate(int)));
-
+    // Menu Bar Actions
     connect(ui->actionUndo, SIGNAL(triggered(bool)), this, SLOT(HandleUndo()));
     connect(ui->actionRedo, SIGNAL(triggered(bool)), this, SLOT(HandleRedo()));
-
     connect(ui->actionSave, SIGNAL(triggered(bool)), this, SLOT(Save()));
+    connect(ui->actionLoad_Backup, SIGNAL(triggered(bool)), this, SLOT(LoadBackupSave()));
+    connect(ui->actionNew_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenNewCustomerDialog()));
+    connect(ui->actionExisting_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenExistingCustomerDialog()));
 
+    // Keyboard Shortcuts
+    connect(new QShortcut(QKeySequence("Ctrl+N"), this), SIGNAL(activated()), this, SLOT(OpenNewCustomerDialog()));
+    connect(new QShortcut(QKeySequence("Ctrl+E"), this), SIGNAL(activated()), this, SLOT(OpenExistingCustomerDialog()));
+    connect(new QShortcut(QKeySequence("Ctrl+Z"), this), SIGNAL(activated()), this, SLOT(HandleUndo()));
+    connect(new QShortcut(QKeySequence("Ctrl+Y"), this), SIGNAL(activated()), this, SLOT(HandleRedo()));
+    connect(new QShortcut(QKeySequence("Ctrl+S"), this), SIGNAL(activated()), this, SLOT(Save()));
 
-    //    /*FOR TESTING*/
-    //    m_customers["SOMETHING"] = new Customer("SOMETHING", "911");
-    //    AddJob("SOMETHING", "2016/12/30", new Car("1920","ford","focus"),"struts", "2", "100");
-    //    AddJob("SOMETHING", "2015/08/15", new Car("1980","toyota","focus"),"brakes", "2", "150");
-
-    //    m_customers["NAME"] = new Customer("NAME", "911-2500-50");
-    //    AddJob("NAME","1995/08/09", new Car("1820","ford","taurus"),"alternator", "2", "150");
-    //    AddJob("NAME","1985/07/12", new Car("1950","toyota","carname"),"brakes", "2", "150");
-
-    //    m_customers["CUSTOMER"] = new Customer("CUSTOMER", "800-555-5555");
-    //    AddJob("CUSTOMER","2011/02/30", new Car("1855","ford","focus"),"struts", "2", "100");
-    //    AddJob("CUSTOMER","2016/12/31", new Car("1980","toyota","focus"),"brakes", "2", "150");
-
-    //    m_customers["ZED"] = new Customer("ZED", "911");
-    //    AddJob("ZED","2011/02/30", new Car("1920","ford","focus"),"struts", "2", "100");
-    //    AddJob("ZED", "2005/11/10", new Car("1980","toyota","focus"),"brakes", "2", "150");
-
-    //    m_customerNames << "SOMETHING" << "NAME" << "ZED" << "CUSTOMER";
-    //    Load();
     LoadFromFile();
 
 }
@@ -113,6 +105,7 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
             //if that was the customer's only job, remove customer
             if(m_customers[ui->mainTable->item(row,1)->text()]->GetJobs().size() == 0)
             {
+                m_tempCustomerInfo[ui->mainTable->item(row,1)->text()] = m_customers[ui->mainTable->item(row,1)->text()]->GetPhoneNumber();
                 m_customers.remove(ui->mainTable->item(row,1)->text());
             }
             //remove from m_dateCustomerPairs O of N, but best solution for now
@@ -536,6 +529,11 @@ void MainWindow::HandleUndo()
         if(temp.second)
         {
             //TODO: Could possibly overload AddJob to take in Name and Job parameters
+            //if the customer is in this map, it means at some point they had no jobs, add the customer when undoing
+            if(m_tempCustomerInfo.contains(name))
+            {
+                AddCustomer(name, m_tempCustomerInfo[name]);
+            }
             // Add the job that was removed (can't call MainWindow's AddJob function because it'll be added to the undo stack again
             m_customers[name]->AddJob(job);
             m_dateCustomerPairs.push_back(qMakePair(job->GetDate(), m_customers[name]));
@@ -545,6 +543,13 @@ void MainWindow::HandleUndo()
         else
         {
             m_customers[name]->RemoveJob(job->GetDate());
+
+            // we remove the customer if they have no jobs, save info in map incase we need to re-add them
+            if(m_customers[name]->GetJobs().size() == 0)
+            {
+                m_tempCustomerInfo[name] = m_customers[name]->GetPhoneNumber();
+                m_customers.remove(name);
+            }
 
             //remove from m_dateCustomerPairs O of N, but best solution for now
             for(int i = 0; i< m_dateCustomerPairs.size(); i++)
@@ -585,6 +590,11 @@ void MainWindow::HandleRedo()
         if(!temp.second)
         {
             //TODO: Could possibly overload AddJob to take in Name and Job parameters
+            //if the customer is in this map, it means at some point they had no jobs and were removed, add the customer when redoing
+            if(m_tempCustomerInfo.contains(name))
+            {
+                AddCustomer(name, m_tempCustomerInfo[name]);
+            }
             // Add the job that was removed (Can't call MainWindow's AddJob Method because it will be added to the undo stack again
             m_customers[name]->AddJob(job);
             m_dateCustomerPairs.push_back(qMakePair(job->GetDate(), m_customers[name]));
@@ -593,7 +603,15 @@ void MainWindow::HandleRedo()
         // temp.second was false something was added, so we must remove it
         else
         {
+
             m_customers[name]->RemoveJob(job->GetDate());
+
+            // we remove the customer if they have no jobs, save info in map incase we need to re-add them
+            if(m_customers[name]->GetJobs().size() == 0)
+            {
+                m_tempCustomerInfo[name] = m_customers[name]->GetPhoneNumber();
+                m_customers.remove(name);
+            }
 
             //remove from m_dateCustomerPairs O of N, but best solution for now
             for(int i = 0; i< m_dateCustomerPairs.size(); i++)
@@ -623,8 +641,42 @@ void MainWindow::HandleRedo()
 
 void MainWindow::Save()
 {
+    //check if the save directory has been created
+    if(!QDir("Data Saves").exists())
+    {
+        QDir().mkdir("Data Saves");
+    }
+
+
+    //get the DateTime for the save file name
+    QDateTime fileNameDate = QDateTime::currentDateTime();
+    QString fileNameLocation = "Data Saves/" + fileNameDate.toString("yyyy MM dd hh mm ss") + ".fpdat";
+    QFile file(fileNameLocation);
+    // We
+    if(m_saveFileNames[0] == "")
+    {
+        m_saveFileNames[0] = fileNameLocation;
+        m_lastSavedIndex = 0;
+    }
+    else
+    {
+        // We only want 10 saves, so if our last save was #10 overwrite #1
+        if(m_lastSavedIndex == 9)
+        {
+            QFile::remove( m_saveFileNames[0]);
+            m_saveFileNames[0] = fileNameLocation;
+            m_lastSavedIndex = 0;
+        }
+        // if our last save was not #10 we save in the next position
+        else
+        {
+            QFile::remove(m_saveFileNames[m_lastSavedIndex + 1]);
+            m_saveFileNames[m_lastSavedIndex+1] = fileNameLocation;
+            m_lastSavedIndex++;
+        }
+
+    }
     // create or open the file to save in
-    QFile file("FairPriceData.dat");
     if(!file.open(QIODevice::WriteOnly))
     {
         return;
@@ -643,6 +695,17 @@ void MainWindow::Save()
     stream << tempCustomers;
     file.close();
     m_unsavedChanges = false;
+
+
+    //Save current save index and save file names
+    QFile fileNames("Data Saves/SaveFileNames.ldat");
+    if(!fileNames.open(QIODevice::WriteOnly))
+    {
+        return;
+    }
+    QDataStream fileNamesStream (&fileNames);
+    fileNamesStream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+    fileNamesStream << m_saveFileNames << m_lastSavedIndex;
 }
 
 void MainWindow::LoadFromFile()
@@ -653,8 +716,76 @@ void MainWindow::LoadFromFile()
     m_dateCustomerPairs.clear();
     ui->mainTable->setRowCount(0);
 
+    //Open current save index and save file names
+    QFile fileNames("Data Saves/SaveFileNames.ldat");
+    if(!fileNames.open(QIODevice::ReadOnly))
+    {
+        return;
+    }
+    QDataStream fileNamesStream (&fileNames);
+    fileNamesStream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+    fileNamesStream >> m_saveFileNames >> m_lastSavedIndex;
+
+
+
     //create or open the file to load from
-    QFile file("FairPriceData.dat");
+    QFile file(m_saveFileNames[m_lastSavedIndex]);
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        return;
+    }
+    //data stream that reads the file
+    QDataStream stream (&file);
+    stream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+
+    // a temp data structure to store customer objects rather than pointers since we can't (de)serialize pointers
+    QMap<QString, Customer> tempCustomers;
+
+    //actual reading of the file
+    stream >> tempCustomers;
+
+    //loop through the temp storage read in from file, and translate it over to the main data storage w/ pointers in m_customers
+    foreach(Customer customer, tempCustomers)
+    {
+        if(!m_customerNames.contains(customer.GetName()))
+        {
+            AddCustomer(customer.GetName(), customer.GetPhoneNumber());
+        }
+        foreach(Job* job, customer.GetJobs())
+        {
+            AddJob(customer.GetName(), job->GetDate(), job->GetCar(), job->GetWork(), job->GetHours(), job->GetPrice());
+            UpdateListing(customer.GetName(), customer.GetPhoneNumber(), job->GetCar()->GetYear(), job->GetCar()->GetMake(), job->GetCar()->GetModel(), job->GetWork(), job->GetHours(),
+                          job->GetPrice(), job->GetDate());
+        }
+    }
+    file.close();
+    // clear undo since AddJob adds to the stack
+    undoStack.clear();
+    m_unsavedChanges = false;
+}
+
+void MainWindow::LoadBackupSave()
+{
+    // Find the backup we want to load from
+    QString backupFileName = QFileDialog::getOpenFileName(
+                this,
+                tr("Load Backup"),
+                "Data Saves/",
+                "Fair Price Data File (*.fpdat)"
+                );
+
+    // if nothing was selected or an invalid file was selected
+    if(backupFileName == "" || !backupFileName.endsWith(".fpdat"))
+    {
+        return;
+    }
+    //clear the table and data structures before loading
+    m_customers.clear();
+    m_customerNames.clear();
+    m_dateCustomerPairs.clear();
+    ui->mainTable->setRowCount(0);
+
+    QFile file(backupFileName);
     if(!file.open(QIODevice::ReadOnly))
     {
         return;
@@ -693,16 +824,22 @@ void MainWindow::closeEvent(QCloseEvent* event)
     if(m_unsavedChanges)
     {
         QMessageBox::StandardButton exitWithoutSaving = QMessageBox::question( this, "Fair Price Data Manager",
-                                                                    tr("You have unsaved changes\nWould you like to save before exiting?"),
-                                                                    QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-                                                                    QMessageBox::Yes);
+                                                                               tr("You have unsaved changes\nWould you like to save before exiting?"),
+                                                                               QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                               QMessageBox::Yes);
         if (exitWithoutSaving == QMessageBox::Yes)
         {
             Save();
+            //if either dialog is open when the application is closed, we close the dialog as well.
+            m_existingCustomerDialog->close();
+            m_newCustomerDialog->close();
             event->accept();
         }
         else if(exitWithoutSaving == QMessageBox::No)
         {
+            //if either dialog is open when the application is closed, we close the dialog as well.
+            m_existingCustomerDialog->close();
+            m_newCustomerDialog->close();
             event->accept();
         }
         else
@@ -710,4 +847,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
             event->ignore();
         }
     }
+    m_existingCustomerDialog->close();
+    m_newCustomerDialog->close();
 }

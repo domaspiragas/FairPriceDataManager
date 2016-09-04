@@ -11,6 +11,7 @@
 #include "newcustomer.h"
 #include "existingcustomer.h"
 #include <QCloseEvent>
+#include <QVector>
 
 namespace Ui {
 class MainWindow;
@@ -28,10 +29,17 @@ private:
     Ui::MainWindow *ui;
     //Main storage of Data
     QMap<QString, Customer*> m_customers;
+    //Temporary storage for Customer Name - Phone Numbers
+    QMap<QString, QString> m_tempCustomerInfo;
     //Store Customer Names to populate Drop Down
     QList<QString> m_customerNames;
     QList<QPair<QString, Customer*>> m_dateCustomerPairs;
     QList<QPair<QString, Customer*>> m_searchDateCustomerPairs;
+    //Stores save file names, initialized to size 10
+    QList<QString> m_saveFileNames = QList<QString>{"","","","","","","","","","",};
+    int m_lastSavedIndex;
+    //List for storing potentially empty customers
+    QList<QString> m_emptyCustomers;
     //Undo And Redo Stacks, QPair<QPair<CustomerName, Job>, bool(removed == true, added == false)>
     QStack<QPair<QPair<QString, Job*>, bool>> undoStack;
     QStack<QPair<QPair<QString, Job*>, bool>> redoStack;
@@ -68,6 +76,7 @@ private slots:
     void HandleRedo();
     void Save();
     void LoadFromFile();
+    void LoadBackupSave();
 
 
 signals:
