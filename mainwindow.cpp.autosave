@@ -17,51 +17,56 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
-    this->showMaximized();
-
+    ui->setupUi(this);   
     //Set main window background color - stylesheet breaks header style
     QPalette pal = palette();
     pal.setColor( QPalette::Window, QColor("#646464"));
     setPalette( pal );
     //set icon
     this->setWindowIcon(QIcon(":/logo/Images/CarIcon.png"));
-
+    // open maximized
+    this->showMaximized();
+    // initialize customer dialogs
     m_newCustomerDialog = new NewCustomer();
     m_existingCustomerDialog = new ExistingCustomer();
     // make the cars(main3, jobs1) and work(main4, jobs2) columns longer by default
     ui->mainTable->setColumnWidth(3, 200);
     ui->mainTable->setColumnWidth(4, 250);
     ui->jobsTable->setColumnWidth(1, 200);
-    ui->jobsTable->setColumnWidth(2, 250);
-
-    //stretches the last column to the end of the screen
+    ui->jobsTable->setColumnWidth(2, 250);    
+    // stretches the last column to the end of the screen
     ui->mainTable->horizontalHeader()->setStretchLastSection(true);
     ui->jobsTable->horizontalHeader()->setStretchLastSection(true);
-
+    // open the program viewing all jobs 
     HideJobsTableShowMainTable();
-
-    // signal sent when cell is double clicked
+    
+    // CONNECT SIGNALS / SLOTS
+    
+    // Job Tables
+    // header buttons for date and name are used to sort the listing
+    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByDate(int)));
+    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByName(int)));
+    connect(ui->jobsTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortJobsTableByDate(int)));
+    // signal sent when cell is double clicked (used for detecting remove)
     connect(ui->mainTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(HandleDoubleClickedCell(int,int)));
-    connect(ui->jobsTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(HandleDoubleClickedCell(int,int)));
-    // used to populate drop down
-    connect(this, SIGNAL(SendCustomerName(QString)), m_existingCustomerDialog, SLOT(AddCustomerToList(QString)));
+    connect(ui->jobsTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(HandleDoubleClickedCell(int,int)));    
+    
+    //Customer Dialogs
     // receive information from dialogs
     connect(m_newCustomerDialog, SIGNAL(NewCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(ReceiveNewCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString,QString)));
     connect(m_existingCustomerDialog, SIGNAL(ExistingCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(ReceiveExistingCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString)));
+    // close dialog
     connect(this, SIGNAL(CloseExistingCustWindow()), m_existingCustomerDialog, SLOT(ReceiveCloseRequest()));
-    connect(this, SIGNAL(CloseNewCustWindow()), m_newCustomerDialog, SLOT(ReceiveCloseRequest()));
-
-    connect(ui->backButton, SIGNAL(clicked(bool)), this, SLOT(GoBack()));
-
-    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByDate(int)));
-    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByName(int)));
-
+    connect(this, SIGNAL(CloseNewCustWindow()), m_newCustomerDialog, SLOT(ReceiveCloseRequest()));   
+    // used to populate drop down in Existing Customer Dialog
+    connect(this, SIGNAL(SendCustomerName(QString)), m_existingCustomerDialog, SLOT(AddCustomerToList(QString)));
+    
+    // Non-Table Elements
+    connect(ui->backButton, SIGNAL(clicked(bool)), this, SLOT(GoBack())); 
     connect(ui->searchBox, SIGNAL(textChanged(QString)), this, SLOT(SortSearched(QString)));
-
-    connect(ui->jobsTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortJobsTableByDate(int)));
+        
     // Menu Bar Actions
     connect(ui->actionUndo, SIGNAL(triggered(bool)), this, SLOT(HandleUndo()));
     connect(ui->actionRedo, SIGNAL(triggered(bool)), this, SLOT(HandleRedo()));
@@ -69,16 +74,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionLoad_Backup, SIGNAL(triggered(bool)), this, SLOT(LoadBackupSave()));
     connect(ui->actionNew_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenNewCustomerDialog()));
     connect(ui->actionExisting_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenExistingCustomerDialog()));
-
+    
     // Keyboard Shortcuts
     connect(new QShortcut(QKeySequence("Ctrl+N"), this), SIGNAL(activated()), this, SLOT(OpenNewCustomerDialog()));
     connect(new QShortcut(QKeySequence("Ctrl+E"), this), SIGNAL(activated()), this, SLOT(OpenExistingCustomerDialog()));
     connect(new QShortcut(QKeySequence("Ctrl+Z"), this), SIGNAL(activated()), this, SLOT(HandleUndo()));
     connect(new QShortcut(QKeySequence("Ctrl+Y"), this), SIGNAL(activated()), this, SLOT(HandleRedo()));
     connect(new QShortcut(QKeySequence("Ctrl+S"), this), SIGNAL(activated()), this, SLOT(Save()));
-
+    
     LoadFromFile();
-
+    
 }
 
 MainWindow::~MainWindow()
@@ -101,7 +106,7 @@ void MainWindow::HandleDoubleClickedCell(int row, int col)
         {
             //add a Pair containing Pair of Customer Name and Job that is going to be removed to undo Stack and a bool of whether it was removed
             undoStack.push(qMakePair(qMakePair(ui->mainTable->item(row,1)->text(), m_customers[ui->mainTable->item(row, 1)->text()]->GetSpecificJob(ui->mainTable->item(row,0)->text())), true));
-
+            
             m_customers[ui->mainTable->item(row, 1)->text()]->RemoveJob(ui->mainTable->item(row, 0)->text());
             //if that was the customer's only job, remove customer
             if(m_customers[ui->mainTable->item(row,1)->text()]->GetJobs().size() == 0)
@@ -158,9 +163,9 @@ void MainWindow::AddCustomer(QString name, QString phoneNumber)
 void MainWindow::AddJob(QString name, QString date, Car* car, QString work, QString hours, QString price)
 {
     m_customers[name]->AddJob(new Job(date, car, work, hours, price));
-
+    
     m_dateCustomerPairs.push_back(qMakePair(date, m_customers[name]));
-
+    
     //manage undo/redo stacks
     undoStack.push(qMakePair(qMakePair(name, m_customers[name]->GetSpecificJob(date)), false));
     redoStack.clear();
@@ -194,7 +199,7 @@ void MainWindow::ReceiveExistingCustomerInfo(QString name, QString year, QString
 }
 void MainWindow::UpdateListing(QString name, QString phoneNumber, QString year, QString make, QString model, QString work, QString hours, QString price, QString date)
 {
-
+    
     QTableWidgetItem* date_ = new QTableWidgetItem(date);
     date_->setFlags(date_->flags() ^ Qt::ItemIsEditable);
     QTableWidgetItem* name_ = new QTableWidgetItem(name);
@@ -211,9 +216,9 @@ void MainWindow::UpdateListing(QString name, QString phoneNumber, QString year, 
     price_->setFlags(price_->flags() ^ Qt::ItemIsEditable);
     QTableWidgetItem* remove_ = new QTableWidgetItem("X");
     remove_->setFlags(remove_->flags() ^ Qt::ItemIsEditable);
-
+    
     ui->mainTable->insertRow(ui->mainTable->rowCount());
-
+    
     ui->mainTable->setItem(ui->mainTable->rowCount()-1, 0, date_);
     ui->mainTable->setItem(ui->mainTable->rowCount()-1, 1, name_);
     ui->mainTable->setItem(ui->mainTable->rowCount()-1, 2, phone_);
@@ -222,7 +227,7 @@ void MainWindow::UpdateListing(QString name, QString phoneNumber, QString year, 
     ui->mainTable->setItem(ui->mainTable->rowCount()-1, 5, hours_);
     ui->mainTable->setItem(ui->mainTable->rowCount()-1, 6, price_);
     ui->mainTable->setItem(ui->mainTable->rowCount()-1, 7, remove_);
-
+    
 }
 void MainWindow::OpenNewCustomerDialog()
 {
@@ -263,10 +268,10 @@ void MainWindow::OpenJobsView(int row, int col)
     //get name - populate jobsTable
     QString name = ui->mainTable->item(row, col)->text();
     ShowJobsTableHideMainTable();
-
+    
     foreach(Job* job, m_customers[name]->GetJobs())
     {
-
+        
         QTableWidgetItem* date_ = new QTableWidgetItem(job->GetDate());
         date_->setFlags(date_->flags() ^ Qt::ItemIsEditable);
         QTableWidgetItem* car_ = new QTableWidgetItem(job->GetCar()->GetYear() + " " + job->GetCar()->GetMake() + " " + job->GetCar()->GetModel());
@@ -279,16 +284,16 @@ void MainWindow::OpenJobsView(int row, int col)
         price_->setFlags(price_->flags() ^ Qt::ItemIsEditable);
         QTableWidgetItem* remove_ = new QTableWidgetItem("X");
         remove_->setFlags(remove_->flags() ^ Qt::ItemIsEditable);
-
+        
         ui->jobsTable->insertRow(ui->jobsTable->rowCount());
-
+        
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,0,date_);
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,1,car_);
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,2,work_);
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,3,hours_);
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,4,price_);
         ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,5,remove_);
-
+        
     }
     //change labels
     ui->nameLabel->setText(name);
@@ -325,7 +330,7 @@ void MainWindow::Load()
                 }
             }
         }
-
+        
     }
 }
 void MainWindow::SortByDate(int section)
@@ -341,10 +346,10 @@ void MainWindow::SortByDate(int section)
             });
             // clear the table
             ui->mainTable->setRowCount(0);
-
+            
             //Used to swap from ascending to decending dates
             m_ascendingDateFlag = !m_ascendingDateFlag;
-
+            
             if(m_ascendingDateFlag)
             {
                 for(int i = 0; i < m_dateCustomerPairs.size(); i++)
@@ -369,13 +374,13 @@ void MainWindow::SortByDate(int section)
             std::sort(m_searchDateCustomerPairs.begin(), m_searchDateCustomerPairs.end(), [] (QPair<QString, Customer*>& lhs, QPair<QString, Customer*>& rhs) {
                 return lhs.first < rhs.first;
             });
-
+            
             // clear the table
             ui->mainTable->setRowCount(0);
-
+            
             //Used to swap from ascending to decending dates
             m_ascendingDateFlag = !m_ascendingDateFlag;
-
+            
             if(m_ascendingDateFlag)
             {
                 for(int i = 0; i < m_searchDateCustomerPairs.size(); i++)
@@ -405,7 +410,7 @@ void MainWindow::SortByName(int section)
         std::sort(m_customerNames.begin(), m_customerNames.end(), [] (QString& lhs, QString& rhs) {
             return lhs < rhs;
         });
-
+        
         ui->mainTable->setRowCount(0);
         //handles alphabetical vs reverse-alphabetical
         m_alphabeticalNameFlag = !m_alphabeticalNameFlag;
@@ -469,12 +474,12 @@ void MainWindow::SortJobsTableByDate(int section)
     if(section == 0)
     {
         ui->jobsTable->setRowCount(0);
-
+        
         m_jobDescendingDateFlag = !m_jobDescendingDateFlag;
-
+        
         foreach(Job* job, m_customers[ui->nameLabel->text()]->GetJobs())
         {
-
+            
             QTableWidgetItem* date_ = new QTableWidgetItem(job->GetDate());
             date_->setFlags(date_->flags() ^ Qt::ItemIsEditable);
             QTableWidgetItem* car_ = new QTableWidgetItem(job->GetCar()->GetYear() + " " + job->GetCar()->GetMake() + " " + job->GetCar()->GetModel());
@@ -487,12 +492,12 @@ void MainWindow::SortJobsTableByDate(int section)
             price_->setFlags(price_->flags() ^ Qt::ItemIsEditable);
             QTableWidgetItem* remove_ = new QTableWidgetItem("X");
             remove_->setFlags(remove_->flags() ^ Qt::ItemIsEditable);
-
+            
             // use flag to swap from oldest-top to oldest-bottom
             if(!m_jobDescendingDateFlag)
             {
                 ui->jobsTable->insertRow(ui->jobsTable->rowCount());
-
+                
                 ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,0,date_);
                 ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,1,car_);
                 ui->jobsTable->setItem(ui->jobsTable->rowCount()-1,2,work_);
@@ -503,7 +508,7 @@ void MainWindow::SortJobsTableByDate(int section)
             else
             {
                 ui->jobsTable->insertRow(0);
-
+                
                 ui->jobsTable->setItem(0,0,date_);
                 ui->jobsTable->setItem(0,1,car_);
                 ui->jobsTable->setItem(0,2,work_);
@@ -511,7 +516,7 @@ void MainWindow::SortJobsTableByDate(int section)
                 ui->jobsTable->setItem(0,4,price_);
                 ui->jobsTable->setItem(0,5,remove_);
             }
-
+            
         }
     }
 }
@@ -544,14 +549,14 @@ void MainWindow::HandleUndo()
         else
         {
             m_customers[name]->RemoveJob(job->GetDate());
-
+            
             // we remove the customer if they have no jobs, save info in map incase we need to re-add them
             if(m_customers[name]->GetJobs().size() == 0)
             {
                 m_tempCustomerInfo[name] = m_customers[name]->GetPhoneNumber();
                 m_customers.remove(name);
             }
-
+            
             //remove from m_dateCustomerPairs O of N, but best solution for now
             for(int i = 0; i< m_dateCustomerPairs.size(); i++)
             {
@@ -563,7 +568,7 @@ void MainWindow::HandleUndo()
                     break;
                 }
             }
-
+            
             for(int j = 0; j < ui->mainTable->rowCount(); j++)
             {
                 // if the customer and date are the same we know we're at the correct row
@@ -604,16 +609,16 @@ void MainWindow::HandleRedo()
         // temp.second was false something was added, so we must remove it
         else
         {
-
+            
             m_customers[name]->RemoveJob(job->GetDate());
-
+            
             // we remove the customer if they have no jobs, save info in map incase we need to re-add them
             if(m_customers[name]->GetJobs().size() == 0)
             {
                 m_tempCustomerInfo[name] = m_customers[name]->GetPhoneNumber();
                 m_customers.remove(name);
             }
-
+            
             //remove from m_dateCustomerPairs O of N, but best solution for now
             for(int i = 0; i< m_dateCustomerPairs.size(); i++)
             {
@@ -625,7 +630,7 @@ void MainWindow::HandleRedo()
                     break;
                 }
             }
-
+            
             for(int j = 0; j < ui->mainTable->rowCount(); j++)
             {
                 // if the customer and date are the same we know we're at the correct row
@@ -647,8 +652,8 @@ void MainWindow::Save()
     {
         QDir().mkdir("Data Saves");
     }
-
-
+    
+    
     //get the DateTime for the save file name
     QDateTime fileNameDate = QDateTime::currentDateTime();
     QString fileNameLocation = "Data Saves/" + fileNameDate.toString("yyyy MM dd hh mm ss") + ".fpdat";
@@ -675,7 +680,7 @@ void MainWindow::Save()
             m_saveFileNames[m_lastSavedIndex+1] = fileNameLocation;
             m_lastSavedIndex++;
         }
-
+        
     }
     // create or open the file to save in
     if(!file.open(QIODevice::WriteOnly))
@@ -685,7 +690,7 @@ void MainWindow::Save()
     // data stream that writes to the file
     QDataStream stream (&file);
     stream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
-
+    
     //can't serialize w/ pointers, create map w/o pointers
     QMap<QString, Customer> tempCustomers;
     foreach(Customer* customer, m_customers)
@@ -696,8 +701,8 @@ void MainWindow::Save()
     stream << tempCustomers;
     file.close();
     m_unsavedChanges = false;
-
-
+    
+    
     //Save current save index and save file names
     QFile fileNames("Data Saves/SaveFileNames.ldat");
     if(!fileNames.open(QIODevice::WriteOnly))
@@ -716,7 +721,7 @@ void MainWindow::LoadFromFile()
     m_customerNames.clear();
     m_dateCustomerPairs.clear();
     ui->mainTable->setRowCount(0);
-
+    
     //Open current save index and save file names
     QFile fileNames("Data Saves/SaveFileNames.ldat");
     if(!fileNames.open(QIODevice::ReadOnly))
@@ -726,9 +731,9 @@ void MainWindow::LoadFromFile()
     QDataStream fileNamesStream (&fileNames);
     fileNamesStream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
     fileNamesStream >> m_saveFileNames >> m_lastSavedIndex;
-
-
-
+    
+    
+    
     //create or open the file to load from
     QFile file(m_saveFileNames[m_lastSavedIndex]);
     if(!file.open(QIODevice::ReadOnly))
@@ -738,13 +743,13 @@ void MainWindow::LoadFromFile()
     //data stream that reads the file
     QDataStream stream (&file);
     stream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
-
+    
     // a temp data structure to store customer objects rather than pointers since we can't (de)serialize pointers
     QMap<QString, Customer> tempCustomers;
-
+    
     //actual reading of the file
     stream >> tempCustomers;
-
+    
     //loop through the temp storage read in from file, and translate it over to the main data storage w/ pointers in m_customers
     foreach(Customer customer, tempCustomers)
     {
@@ -774,7 +779,7 @@ void MainWindow::LoadBackupSave()
                 "Data Saves/",
                 "Fair Price Data File (*.fpdat)"
                 );
-
+    
     // if nothing was selected or an invalid file was selected
     if(backupFileName == "" || !backupFileName.endsWith(".fpdat"))
     {
@@ -785,7 +790,7 @@ void MainWindow::LoadBackupSave()
     m_customerNames.clear();
     m_dateCustomerPairs.clear();
     ui->mainTable->setRowCount(0);
-
+    
     QFile file(backupFileName);
     if(!file.open(QIODevice::ReadOnly))
     {
@@ -794,13 +799,13 @@ void MainWindow::LoadBackupSave()
     //data stream that reads the file
     QDataStream stream (&file);
     stream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
-
+    
     // a temp data structure to store customer objects rather than pointers since we can't (de)serialize pointers
     QMap<QString, Customer> tempCustomers;
-
+    
     //actual reading of the file
     stream >> tempCustomers;
-
+    
     //loop through the temp storage read in from file, and translate it over to the main data storage w/ pointers in m_customers
     foreach(Customer customer, tempCustomers)
     {
