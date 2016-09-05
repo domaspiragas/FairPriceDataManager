@@ -1,3 +1,4 @@
+/*Created by Domas Piragas 2016*/
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QLineEdit>
@@ -18,51 +19,58 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->showMaximized();
-
     //Set main window background color - stylesheet breaks header style
     QPalette pal = palette();
     pal.setColor( QPalette::Window, QColor("#646464"));
     setPalette( pal );
     //set icon
     this->setWindowIcon(QIcon(":/logo/Images/CarIcon.png"));
-
+    // open maximized
+    this->showMaximized();
+    // initialize customer dialogs
     m_newCustomerDialog = new NewCustomer();
     m_existingCustomerDialog = new ExistingCustomer();
     // make the cars(main3, jobs1) and work(main4, jobs2) columns longer by default
     ui->mainTable->setColumnWidth(3, 200);
     ui->mainTable->setColumnWidth(4, 250);
+    ui->mainTable->setColumnWidth(1, 250);
+    ui->mainTable->setColumnWidth(2, 250);
     ui->jobsTable->setColumnWidth(1, 200);
     ui->jobsTable->setColumnWidth(2, 250);
-
-    //stretches the last column to the end of the screen
+    // stretches the last column to the end of the screen
     ui->mainTable->horizontalHeader()->setStretchLastSection(true);
     ui->jobsTable->horizontalHeader()->setStretchLastSection(true);
-
+    // open the program viewing all jobs
     HideJobsTableShowMainTable();
 
-    // signal sent when cell is double clicked
+    // CONNECT SIGNALS / SLOTS --------------------------------
+
+    // Job Tables -----------
+    // header buttons for date and name are used to sort the listing
+    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByDate(int)));
+    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByName(int)));
+    connect(ui->jobsTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortJobsTableByDate(int)));
+    // signal sent when cell is double clicked (used for detecting remove)
     connect(ui->mainTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(HandleDoubleClickedCell(int,int)));
     connect(ui->jobsTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(HandleDoubleClickedCell(int,int)));
-    // used to populate drop down
-    connect(this, SIGNAL(SendCustomerName(QString)), m_existingCustomerDialog, SLOT(AddCustomerToList(QString)));
+
+    //Customer Dialogs -----------
     // receive information from dialogs
     connect(m_newCustomerDialog, SIGNAL(NewCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(ReceiveNewCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString,QString)));
     connect(m_existingCustomerDialog, SIGNAL(ExistingCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(ReceiveExistingCustomerInfo(QString,QString,QString,QString,QString,QString,QString,QString)));
+    // close dialog
     connect(this, SIGNAL(CloseExistingCustWindow()), m_existingCustomerDialog, SLOT(ReceiveCloseRequest()));
     connect(this, SIGNAL(CloseNewCustWindow()), m_newCustomerDialog, SLOT(ReceiveCloseRequest()));
+    // used to populate drop down in Existing Customer Dialog
+    connect(this, SIGNAL(SendCustomerName(QString)), m_existingCustomerDialog, SLOT(AddCustomerToList(QString)));
 
+    // Non-Table Elements ------------
     connect(ui->backButton, SIGNAL(clicked(bool)), this, SLOT(GoBack()));
-
-    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByDate(int)));
-    connect(ui->mainTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortByName(int)));
-
     connect(ui->searchBox, SIGNAL(textChanged(QString)), this, SLOT(SortSearched(QString)));
 
-    connect(ui->jobsTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(SortJobsTableByDate(int)));
-    // Menu Bar Actions
+    // Menu Bar Actions ------------
     connect(ui->actionUndo, SIGNAL(triggered(bool)), this, SLOT(HandleUndo()));
     connect(ui->actionRedo, SIGNAL(triggered(bool)), this, SLOT(HandleRedo()));
     connect(ui->actionSave, SIGNAL(triggered(bool)), this, SLOT(Save()));
@@ -70,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionNew_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenNewCustomerDialog()));
     connect(ui->actionExisting_Customer, SIGNAL(triggered(bool)), this, SLOT(OpenExistingCustomerDialog()));
 
-    // Keyboard Shortcuts
+    // Keyboard Shortcuts -------------
     connect(new QShortcut(QKeySequence("Ctrl+N"), this), SIGNAL(activated()), this, SLOT(OpenNewCustomerDialog()));
     connect(new QShortcut(QKeySequence("Ctrl+E"), this), SIGNAL(activated()), this, SLOT(OpenExistingCustomerDialog()));
     connect(new QShortcut(QKeySequence("Ctrl+Z"), this), SIGNAL(activated()), this, SLOT(HandleUndo()));
@@ -78,7 +86,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(QKeySequence("Ctrl+S"), this), SIGNAL(activated()), this, SLOT(Save()));
 
     LoadFromFile();
-
+    //Windows 10 Work Around (Sort by date upon opening clears and doesn't repopulate)
+    SortSearched("");
 }
 
 MainWindow::~MainWindow()

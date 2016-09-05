@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = FairPriceDataManager
 TEMPLATE = app
-
+RC_FILE = FairPriceDataManager.rc
 
 SOURCES += main.cpp\
         mainwindow.cpp \

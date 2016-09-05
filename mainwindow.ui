@@ -48,6 +48,7 @@
          <string notr="true">QWidget
 {
 	color:#fffff8;
+	font-size: 12pt;
 }</string>
         </property>
         <property name="text">
@@ -83,6 +84,7 @@
 	background-color: #333333;
 	color: white;
 	border: 1px solid #fffff8;
+	font-size: 12pt;
 }</string>
         </property>
        </widget>
@@ -93,7 +95,7 @@
      <widget class="QTableWidget" name="mainTable">
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <pointsize>12</pointsize>
        </font>
       </property>
       <property name="styleSheet">
@@ -110,7 +112,7 @@ QHeaderView::section {
 	border-style: none;
     border-bottom: 1px solid #fffff8;
     border-right: 1px solid #fffff8;
-    font-size: 8pt;
+    font-size: 12pt;
 }
 
 QHeaderView::section:pressed
@@ -120,11 +122,11 @@ QHeaderView::section:pressed
 	border-style: none;
     border-bottom: 1px solid #fffff8;
     border-right: 1px solid #fffff8;
-    font-size: 8pt;
+    font-size: 12pt;
 }
 QTableWidget {
     gridline-color: #fffff8;
-    font-size: 10pt;
+    font-size: 12pt;
 }
 
 QTableWidget QTableCornerButton::section {
@@ -205,24 +207,6 @@ QHeaderView::section:vertical
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="phoneNumberLabel">
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QWidget
-{
-	color:#fffff8;
-}</string>
-        </property>
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="nameLabel">
         <property name="font">
          <font>
@@ -240,13 +224,31 @@ color:#fffff8;
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="phoneNumberLabel">
+        <property name="font">
+         <font>
+          <pointsize>20</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget
+{
+	color:#fffff8;
+}</string>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
      <widget class="QTableWidget" name="jobsTable">
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <pointsize>12</pointsize>
        </font>
       </property>
       <property name="styleSheet">
@@ -262,12 +264,12 @@ QHeaderView::section {
 	border-style: none;
     border-bottom: 1px solid #fffff8;
     border-right: 1px solid #fffff8;
-    font-size: 8pt;
+    font-size: 12pt;
 }
 
 QTableWidget {
     gridline-color: #fffff8;
-    font-size: 10pt;
+    font-size: 12pt;
 }
 
 QTableWidget QTableCornerButton::section {
@@ -406,13 +408,14 @@ QPushButton:pressed
      <x>0</x>
      <y>0</y>
      <width>1091</width>
-     <height>21</height>
+     <height>27</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">QWidget
 {
 	background-color:#1a1a1a;
+	font-size: 12pt;
 }
 QWidget::Item 
 {
@@ -481,6 +484,11 @@ QWidget::Item:pressed
   <action name="actionLoad_Backup">
    <property name="text">
     <string>Load Backup</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
   </action>
  </widget>
