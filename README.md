@@ -11,9 +11,10 @@ customers, their cars, and the jobs performed and has no limit to the number of 
 <h3>Some Feature Details</h3>
 
 * Add/remove new customers and jobs with hotkey implementation
-* Simplified process for adding jobs to existing customers
-* Sort by date or Customer Name
-* Real-Time search by Customer Name
+* Simplified process for adding jobs for existing customers
+* New customer/job dialogs autoformat input so dates and phone numbers are stored with a consistent structure
+* Sort by date or customer name
+* Real-Time search by customer name
 * Separate window listing all jobs for a specific customer
 * Undo/Redo for adding/removing jobs and customers
 * Local data storage datas treaming to a save file
